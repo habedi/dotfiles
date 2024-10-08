@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "template-python-project-repo"
+version = "0.1.0"
+description = "A template for a data science or machine learning project in Python."
+authors = ["Hassan Abedi <hassan.abedi.t@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "template_python_project_repo" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pylint = "^3.0.3"
+pytest = "^8.0.1"
+jupyter = "^1.0.0"
+seaborn = "^0.13.2"
+pandas = "^2.2.1"
+mypy = "^1.11.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = [".", "bin", "src"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+disallow_untyped_calls = true
+strict_optional = true
+warn_redundant_casts = true
