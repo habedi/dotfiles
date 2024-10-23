@@ -1,0 +1,79 @@
+[user]
+    name = Hassan Abedi
+    email = hassan.abedi.t@gmail.com
+
+[credential]
+    helper = store
+
+[core]
+    editor = nano # Set your preferred text editor to Nano
+    autocrlf = input # Convert CRLF to LF on commit for cross-platform compatibility
+    excludesfile = ~/.gitignore_global # Path to global .gitignore file
+    longpaths = true # Enable support for long paths on Windows
+    hooksPath = ~/.githooks # Set a global hooks path
+
+[color]
+    ui = auto # Enable colorized output for Git commands
+
+[alias]
+    tuah = push # Custom alias for 'git push'
+    co = checkout # Shorthand for 'git checkout'
+    br = branch # Shorthand for 'git branch'
+    ci = commit # Shorthand for 'git commit'
+    st = status # Shorthand for 'git status'
+    lg = log --oneline --graph --decorate --all # Compact, graphical log display
+    amend = commit --amend --no-edit # Quickly amend the last commit
+    pom = push origin main # Push to the 'main' branch quickly
+    psm = push --set-upstream origin main # Set upstream and push to 'main'
+    last = log -1 HEAD # Show the last commit
+    save = stash save # Shorthand for 'git stash save'
+    unstage = reset HEAD -- # Undo a git add
+    lola = log --graph --decorate --pretty=oneline --abbrev-commit --all # Detailed log with graph
+    hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short # Compact history view with author info
+    filelog = log --follow --name-status --oneline # View file history with status
+    bclean = "!git branch --merged | egrep -v '(^\\*|main|develop)' | xargs git branch -d" # Delete merged branches except main/develop
+    prune-remote = "remote prune origin" # Prune remote-tracking branches that no longer exist on the remote
+    nb = "!f() { git checkout -b \"$1\" && git push --set-upstream origin \"$1\"; }; f" # Create a new branch and set upstream in one step
+    up = "!git remote update -p; git merge --ff-only @{u}" # Fetch and fast-forward the current branch
+    sync = "!git pull --rebase --prune; git push" # Rebase local changes on top of upstream and push
+    stash-pop = stash pop # Simple alias for popping the stash
+    stash-list = stash list # List all stashes
+    stash-apply = stash apply # Apply a stash without dropping it
+    sminit = submodule update --init --recursive # Initialize and update submodules
+    smupdate = submodule update --recursive --remote # Update all submodules to the latest commit
+    s = status -sb # Compact status with branch info
+    ds = diff --staged # Show diff of staged changes
+    dsf = diff --staged --name-only # Show file names of staged changes
+    rml = remote -v # List all remotes with their URLs
+    rmremote = "!sh -c 'git remote remove $0; git remote prune origin'" # Remove a remote and prune its references
+    ca = commit -a # Commit all tracked files with a message
+    amend-last = commit --amend --reuse-message=HEAD # Amend last commit with the same message
+    editconfig = "!nano ~/.gitconfig" # Quickly open the .gitconfig file in Nano
+    whoami = config --get user.name && config --get user.email # Display your Git identity
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f # Configuration for Git LFS (Large File Storage)
+    smudge = git-lfs smudge -- %f # Apply LFS filters when checking out files
+    process = git-lfs filter-process # Use Git LFS filter process for relevant files
+    required = true # Ensure LFS is required for relevant files
+
+[push]
+    default = simple # Only push the current branch to its upstream branch
+
+[fetch]
+    prune = true # Automatically prune (remove) remote-tracking branches that no longer exist on the remote
+
+[rebase]
+    autosquash = true # Automatically move commits that start with 'fixup!' or 'squash!' during rebase
+
+[pull]
+    rebase = false # Use merge for git pull by default, change to 'true' to use rebase
+
+[interactive]
+    diffFilter = delta # Use 'delta' for interactive diffs if installed, providing a more readable diff experience
+
+[delta]
+    features = side-by-side line-numbers decorations # Customizes delta output for better visual clarity (if using delta)
+
+[rerere]
+    enabled = true # Enable reuse of recorded conflict resolutions, helpful for resolving the same conflicts repeatedly
