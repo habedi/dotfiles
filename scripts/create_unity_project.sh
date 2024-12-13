@@ -1,63 +1,81 @@
 #!/bin/bash
 
-# Get the base directory from the first argument or use the current directory
+# Set the base directory from the first argument or default to the current directory
 BASE_DIR=${1:-"$(pwd)/"}
 
-# Create the base project structure
-mkdir -p "$BASE_DIR"/{Assets,Packages,ProjectSettings,Logs}
+# Function to create a directory and handle errors
+create_dir() {
+    mkdir -p "$1" || {
+        echo "Error creating directory: $1"
+        exit 1
+    }
+}
 
-# Inside Assets
-mkdir -p "$BASE_DIR/Assets"/{Art,Audio,Prefabs,Scenes,Scripts,UI,Plugins,Resources,Settings,ThirdParty}
+# Create the base project structure
+echo "Creating Unity project structure..."
+create_dir "$BASE_DIR/Assets"
+create_dir "$BASE_DIR/Packages"
+create_dir "$BASE_DIR/ProjectSettings"
+create_dir "$BASE_DIR/Logs"
+
+# Create subdirectories under Assets
+echo "Creating subdirectories under Assets..."
+create_dir "$BASE_DIR/Assets/Art"
+create_dir "$BASE_DIR/Assets/Audio"
+create_dir "$BASE_DIR/Assets/Prefabs"
+create_dir "$BASE_DIR/Assets/Scenes"
+create_dir "$BASE_DIR/Assets/Scripts"
+create_dir "$BASE_DIR/Assets/UI"
+create_dir "$BASE_DIR/Assets/Plugins"
+create_dir "$BASE_DIR/Assets/Resources"
+create_dir "$BASE_DIR/Assets/Settings"
+create_dir "$BASE_DIR/Assets/ThirdParty"
 
 # Inside Art
-mkdir -p "$BASE_DIR/Assets/Art"/{Animations,Materials,Models,Textures}
+create_dir "$BASE_DIR/Assets/Art/Animations"
+create_dir "$BASE_DIR/Assets/Art/Materials"
+create_dir "$BASE_DIR/Assets/Art/Models"
+create_dir "$BASE_DIR/Assets/Art/Textures"
 
 # Inside Audio
-mkdir -p "$BASE_DIR/Assets/Audio"/{Music,SoundEffects}
+create_dir "$BASE_DIR/Assets/Audio/Music"
+create_dir "$BASE_DIR/Assets/Audio/SoundEffects"
 
 # Inside Scenes
-mkdir -p "$BASE_DIR/Assets/Scenes"/{MainMenu,Levels,Sandbox}
+create_dir "$BASE_DIR/Assets/Scenes/MainMenu"
+create_dir "$BASE_DIR/Assets/Scenes/Levels"
+create_dir "$BASE_DIR/Assets/Scenes/Sandbox"
 
 # Inside Scripts
-mkdir -p "$BASE_DIR/Assets/Scripts"/{Managers,Gameplay,UI,Utilities,Tests}
+create_dir "$BASE_DIR/Assets/Scripts/Managers"
+create_dir "$BASE_DIR/Assets/Scripts/Gameplay"
+create_dir "$BASE_DIR/Assets/Scripts/UI"
+create_dir "$BASE_DIR/Assets/Scripts/Utilities"
+create_dir "$BASE_DIR/Assets/Scripts/Tests"
 
 # Inside UI
-mkdir -p "$BASE_DIR/Assets/UI"/{Fonts,Images,Prefabs}
+create_dir "$BASE_DIR/Assets/UI/Fonts"
+create_dir "$BASE_DIR/Assets/UI/Images"
+create_dir "$BASE_DIR/Assets/UI/Prefabs"
 
-# Create a text file with the structure and explanations
+# Create structure explanation file
 tree_structure="$BASE_DIR/structure.txt"
+echo "Writing structure explanation to $tree_structure..."
 cat <<EOL > "$tree_structure"
 Unity Project Structure
 ========================
 
 - Assets/               : Main folder for all game assets.
-  - Art/                : Visual assets.
-    - Animations/       : Animation clips and controllers.
-    - Materials/        : Materials for rendering.
-    - Models/           : 3D models.
-    - Textures/         : Textures for materials and UI.
-  - Audio/              : Sound assets.
-    - Music/            : Background music.
-    - SoundEffects/     : Game sound effects.
+  - Art/                : Visual assets (animations, models, textures).
+  - Audio/              : Sound assets (music and sound effects).
   - Prefabs/            : Reusable prefabricated game objects.
   - Scenes/             : Game and testing scenes.
-    - MainMenu/         : Scenes related to the main menu.
-    - Levels/           : Game levels.
-    - Sandbox/          : Testing or prototype scenes.
   - Scripts/            : Code for game logic and utilities.
-    - Managers/         : Game-wide managers (e.g., GameManager).
-    - Gameplay/         : Core gameplay mechanics.
-    - UI/               : Scripts related to user interface.
-    - Utilities/        : Helper scripts (e.g., math helpers).
-    - Tests/            : Unit or integration tests.
-  - UI/                 : UI assets.
-    - Fonts/            : Custom fonts.
-    - Images/           : UI icons and images.
-    - Prefabs/          : Prefabricated UI components.
+  - UI/                 : UI-related assets.
   - Plugins/            : Third-party plugins.
-  - Resources/          : Assets loaded dynamically during runtime.
-  - Settings/           : Configuration files and settings.
-  - ThirdParty/         : Third-party assets or libraries.
+  - Resources/          : Dynamically loaded runtime assets.
+  - Settings/           : Configuration files.
+  - ThirdParty/         : External libraries and assets.
 
 - Packages/             : Unity Package Manager dependencies.
 - ProjectSettings/      : Project settings and configuration.
@@ -75,7 +93,6 @@ cat <<EOL > "$gitignore_file"
 [Bb]uilds/
 [Ll]ogs/
 [Mm]emoryCaptures/
-
 # Visual Studio
 *.csproj
 *.unityproj
@@ -87,7 +104,8 @@ cat <<EOL > "$gitignore_file"
 *.pidb
 *.booproj
 *.svd
-
+# JetBrains Rider
+.idea/
 # OS generated files
 .DS_Store
 Thumbs.db
@@ -98,7 +116,6 @@ gitattributes_file="$BASE_DIR/.gitattributes"
 cat <<EOL > "$gitattributes_file"
 # Set default behaviour to automatically merge binary files
 * text=auto
-
 # Unity YAML files
 *.unity merge=unityyaml
 *.asset merge=unityyaml
@@ -107,7 +124,6 @@ cat <<EOL > "$gitattributes_file"
 *.anim merge=unityyaml
 *.physicsMaterial merge=unityyaml
 *.physicsMaterial2D merge=unityyaml
-
 # Image files
 *.png binary
 *.jpg binary
@@ -119,12 +135,10 @@ cat <<EOL > "$gitattributes_file"
 *.gif binary
 *.bmp binary
 *.exr binary
-
 # Audio files
 *.mp3 binary
 *.wav binary
 *.ogg binary
-
 # Model files
 *.fbx binary
 *.obj binary
