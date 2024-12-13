@@ -91,9 +91,6 @@ cat <<EOL > "$gitignore_file"
 # OS generated files
 .DS_Store
 Thumbs.db
-
-# Add any other files or directories to ignore below
-# ...
 EOL
 
 # Create `.gitattributes` file
@@ -136,13 +133,76 @@ cat <<EOL > "$gitattributes_file"
 *.dxf binary
 *.max binary
 *.blend binary
+EOL
 
-# Add any other binary files to merge below
-# ...
+# Create `ignore.conf` file for Plastic SCM
+ignore_conf_file="$BASE_DIR/ignore.conf"
+cat <<EOL > "$ignore_conf_file"
+Library
+library
+Temp
+temp
+Obj
+obj
+Build
+build
+Builds
+builds
+UserSettings
+usersettings
+MemoryCaptures
+memorycaptures
+Logs
+logs
+**/Assets/AssetStoreTools
+**/assets/assetstoretools
+/Assets/Plugins/PlasticSCM*
+/assets/plugins/PlasticSCM*
+*.private
+*.private.meta
+^*.private.[0-9]+
+^*.private.[0-9]+.meta
+.vs
+.vscode
+.idea
+.gradle
+ExportedObj
+.consulo
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+crashlytics-build.properties
+*.apk
+*.aab
+*.app
+*.unitypackage
+~UnityDirMonSyncFile~*
+**/Assets/AddressableAssetsData/*/*.bin*
+**/assets/addressableassetsdata/*/*.bin*
+**/Assets/StreamingAssets/aa.meta
+**/assets/streamingassets/*/aa/*
+.DS_Store*
+Thumbs.db
+Desktop.ini
 EOL
 
 # Print completion message
 echo "Unity project structure created successfully in the '$BASE_DIR' directory."
 echo "See '$tree_structure' for information on the project structure."
-echo ".gitignore and .gitattributes files created successfully."
-echo "Happy game development! 🎮"
+echo ".gitignore, .gitattributes, and ignore.conf files created successfully."
+echo "You can start building your Unity project now! 🚀 🎮 🎉"
