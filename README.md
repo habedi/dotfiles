@@ -4,11 +4,11 @@ This repository contains my dotfiles and other handy files and scripts that I us
 It includes configurations for the following programs:
 
 - **Python-related files**
-  - [pyproject.toml](pyproject.toml)
+    - [pyproject.toml](pyproject.toml)
 - [**Git-related files**](git/)
 - [**Useful scripts**](scripts/)
 - **Editor configurations**
-  - [editorconfig](.editorconfig)
+    - [editorconfig](.editorconfig)
 
 ## License
 
