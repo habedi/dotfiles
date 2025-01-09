@@ -23,9 +23,9 @@ check_status() {
 # Source: https://github.com/ollama/ollama/issues/3489#issuecomment-2094665760
 
 # Uncomment these lines if you need to stop/start specific applications before/after fixing the module.
-# echo "Stopping the Ollama snap application..."
-# sudo snap stop ollama
-# check_status "Failed to stop the Ollama snap application."
+ echo "Stopping the Ollama snap application..."
+ sudo snap stop ollama
+ check_status "Failed to stop the Ollama snap application."
 
 echo "Removing the nvidia_uvm module..."
 sudo rmmod nvidia_uvm
@@ -45,9 +45,9 @@ sudo modprobe nvidia_uvm
 check_status "Failed to insert the nvidia_uvm module."
 
 # Uncomment these lines if you need to restart specific applications after fixing the module.
-# echo "Starting the Ollama snap application..."
-# sudo snap start ollama
-# check_status "Failed to start the Ollama snap application."
+ echo "Starting the Ollama snap application..."
+ sudo snap start ollama
+ check_status "Failed to start the Ollama snap application."
 
 echo "Displaying NVIDIA graphics card information with nvidia-smi..."
 nvidia-smi
