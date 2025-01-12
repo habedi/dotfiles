@@ -45,4 +45,4 @@ echo -e "\e[34mDisplaying NVIDIA graphics card information with nvidia-smi...\e[
 nvidia-smi
 check_status "Failed to retrieve NVIDIA graphics card information."
 
-echo -e "\e[32mnvidia_uvm module successfully reloaded and NVIDIA graphics card is operational.\e[0m"  # Green color for success
+echo -e "\e[32mnvidia_uvm module successfully reloaded and NVIDIA graphics card is operational.\e[0m"
