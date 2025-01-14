@@ -18,10 +18,10 @@ pytest = "^8.0.1"
 pytest-cov = "^6.0.0"
 pytest-mock = "^3.14.0"
 mypy = "^1.11.1"
-ruff = "^0.8.6"
+ruff = "^0.9.1"
 
-[tool.poetry.scripts]
-cli = "src.cli:main"
+#[tool.poetry.scripts]
+#cli = "src.cli:main"
 
 [build-system]
 requires = ["poetry-core"]
