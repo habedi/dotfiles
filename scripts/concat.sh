@@ -6,114 +6,152 @@ set -euo pipefail
 # concat.sh -e .c,.h -o concatenated_files_output.txt -t src,include
 # concat.sh -e .py -o concatenated_files_output.txt -x .venv,venv -t .
 
-TREE_COMMAND="tree"
-TARGET_EXTENSIONS=(".py")
-OUTPUT_FILE="concatenated_output.txt"
+# Default settings
+TREE_CMD="tree"
+EXTENSIONS=(".py")
+OUTPUT="concatenated_output.txt"
 PRINT_TREE=false
-EXCLUDE_PATTERNS=()
+EXCLUDE_DIRS=()
 
-usage() {
+print_usage() {
   cat <<EOF
-Usage: $0 [-e extensions] [-o output_file] [-x exclude_patterns] [-t] <directory_path(s)>
-  -e: Comma-separated list of file extensions (e.g., .c,.h,.cpp). Default: .py
-  -o: Output file name (default: concatenated_output.txt)
-  -x: Comma-separated list of patterns to exclude (e.g., .venv,venv,node_modules)
-  -t: Print tree structure to output (optional)
-  directory_path(s): Single directory or comma-separated list of directories
+Usage: $0 [-e ext1,ext2,...] [-o output_file] [-x exclude1,exclude2,...] [-t] <dir1> [<dir2> ...]
+
+  -e  Comma-separated list of extensions (e.g., .c,.h,.cpp). Default: .py
+  -o  Output file path. Default: concatenated_output.txt
+  -x  Comma-separated list of directories (or nested paths) to skip.
+      Examples: .venv,node_modules,src/graphql_handler/tests
+  -t  Show a directory tree (requires 'tree'; falls back to 'find').
+
+  <dir1> [<dir2> ...]  One or more existing directories to scan.
 EOF
   exit 1
 }
 
+# Parse options
 while getopts "e:o:x:t" opt; do
-  case $opt in
-    e) IFS=',' read -r -a TARGET_EXTENSIONS <<< "$OPTARG" ;;
-    o) OUTPUT_FILE="$OPTARG" ;;
-    x) IFS=',' read -r -a EXCLUDE_PATTERNS <<< "$OPTARG" ;;
-    t) PRINT_TREE=true ;;
-    *) usage ;;
+  case "$opt" in
+    e)
+      IFS=',' read -r -a EXTENSIONS <<< "$OPTARG"
+      ;;
+    o)
+      OUTPUT="$OPTARG"
+      ;;
+    x)
+      IFS=',' read -r -a EXCLUDE_DIRS <<< "$OPTARG"
+      ;;
+    t)
+      PRINT_TREE=true
+      ;;
+    *)
+      print_usage
+      ;;
   esac
 done
+shift $((OPTIND - 1))
 
-shift $((OPTIND-1))
-
-if [ "$#" -ne 1 ]; then
-  usage
+# Need at least one target directory
+if [ "$#" -lt 1 ]; then
+  echo "Error: at least one directory is required."
+  print_usage
 fi
 
-# Check if the argument contains commas, and split it if it does
-if [[ "$1" == *,* ]]; then
-  IFS=',' read -r -a TARGET_PATHS <<< "$1"
-else
-  TARGET_PATHS=("$1")
-fi
-
-# Verify all specified paths exist
-for dir in "${TARGET_PATHS[@]}"; do
-  if [[ ! -d "$dir" ]]; then
-    echo "Error: '$dir' is not a valid directory."
+# Verify and collect target directories
+TARGET_DIRS=()
+for arg in "$@"; do
+  if [ ! -d "$arg" ]; then
+    echo "Error: '$arg' is not a directory."
     exit 1
   fi
+  TARGET_DIRS+=("$arg")
 done
 
-get_tree_structure() {
-  local dir="$1"
-  if command -v "$TREE_COMMAND" > /dev/null 2>&1; then
-    local exclude_args=()
-    for pattern in "${EXCLUDE_PATTERNS[@]}"; do
-      exclude_args+=(-I "$pattern")
-    done
-    "$TREE_COMMAND" "${exclude_args[@]}" "$dir"
-  else
-    echo "'$TREE_COMMAND' not found. Using fallback with 'find'..."
-    local exclude_args=()
-    for pattern in "${EXCLUDE_PATTERNS[@]}"; do
-      exclude_args+=(-not -path "*/$pattern/*")
-    done
-    (cd "$dir" && find . "${exclude_args[@]}" -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g')
+# Build an array that represents: ( -path "*/dirA" -o -path "*/dirB" ) -prune -o
+# or empty if no excludes
+build_prune_array() {
+  local -n _out_array=$1
+  _out_array=()
+
+  if [ "${#EXCLUDE_DIRS[@]}" -eq 0 ]; then
+    return
   fi
+
+  # start a parenthesized group
+  _out_array+=( "(" )
+  for d in "${EXCLUDE_DIRS[@]}"; do
+    _out_array+=( -path "*/$d" -o )
+  done
+  unset '_out_array[${#_out_array[@]}-1]'  # remove trailing -o
+  _out_array+=( ")" "-prune" "-o" )
 }
 
-# Write header and optional tree structure to the output file
+# Build an array for: ( -iname "*ext1" -o -iname "*ext2" )
+# This goes right after -type f in the find command.
+build_ext_array() {
+  local -n _out_array=$1
+  _out_array=()
+
+  for ext in "${EXTENSIONS[@]}"; do
+    _out_array+=( -iname "*$ext" -o )
+  done
+  unset '_out_array[${#_out_array[@]}-1]'  # remove trailing -o
+}
+
+# Print a tree (skipping excluded dirs) for one directory
+print_tree() {
+  local dir="$1"
+  echo "Directory structure for: $dir"
+  if command -v "$TREE_CMD" &>/dev/null; then
+    # Pass each exclude to tree as -I
+    local IARGS=()
+    for d in "${EXCLUDE_DIRS[@]}"; do
+      IARGS+=( -I "$d" )
+    done
+    "$TREE_CMD" "${IARGS[@]}" "$dir"
+  else
+    # Fallback: use find + sed
+    local prune_arr=()
+    build_prune_array prune_arr
+    (cd "$dir" && find . "${prune_arr[@]}" -print | \
+      sed -e 's;[^/]*/;|___;g;s;___|; |;g')
+  fi
+  echo ""
+}
+
+# Write header (tree + file contents) to output
 {
   if [ "$PRINT_TREE" = true ]; then
-    echo "--- Directory Structure ---"
-    for dir in "${TARGET_PATHS[@]}"; do
-      echo "Structure for directory: $dir"
-      get_tree_structure "$dir"
-      echo ""
+    echo "--- Directory Trees ---"
+    for d in "${TARGET_DIRS[@]}"; do
+      print_tree "$d"
     done
   fi
-
   echo "--- File Contents ---"
   echo ""
-} > "$OUTPUT_FILE"
+} > "$OUTPUT"
 
-# Build find expression for extensions
-find_ext_expr=()
-for ext in "${TARGET_EXTENSIONS[@]}"; do
-  find_ext_expr+=(-name "*$ext" -o)
-done
-unset 'find_ext_expr[${#find_ext_expr[@]}-1]'  # remove trailing -o
+# Now loop over each target dir and append matching files
+for d in "${TARGET_DIRS[@]}"; do
+  # Build prune array and extension array for this iteration
+  prune_arr=()
+  build_prune_array prune_arr
 
-# Build find expression for exclusions
-find_excl_expr=()
-for pattern in "${EXCLUDE_PATTERNS[@]}"; do
-  find_excl_expr+=(-not -path "*/$pattern/*")
-done
+  ext_arr=()
+  build_ext_array ext_arr
 
-# Process each target path
-for dir in "${TARGET_PATHS[@]}"; do
-  # Concatenate file contents from this directory
-  while IFS= read -r -d $'\0' file; do
-    {
-      echo "--- Start of File: $file ---"
-      cat "$file"
-      echo ""
-      echo "--- End of File: $file ---"
-      echo ""
-    } >> "$OUTPUT_FILE"
-  done < <(find "$dir" -type f \( "${find_ext_expr[@]}" \) "${find_excl_expr[@]}" -print0)
+  # Now call find without eval:
+  # find "$d" "${prune_arr[@]}" -type f "(" "${ext_arr[@]}" ")" -print0
+  find "$d" "${prune_arr[@]}" -type f "(" "${ext_arr[@]}" ")" -print0 | \
+    while IFS= read -r -d '' file; do
+      {
+        echo "----- Begin: $file -----"
+        cat "$file"
+        echo ""
+        echo "----- End: $file -----"
+        echo ""
+      } >> "$OUTPUT"
+    done
 done
 
-echo "Processing complete. Output written to '$OUTPUT_FILE'."
+echo "Done. Output is in '$OUTPUT'."
 exit 0
