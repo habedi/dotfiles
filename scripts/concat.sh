@@ -1,10 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 # Example usages:
-# concat.sh -e .c,.h -o concatenated_files_output.txt -t .
-# concat.sh -e .c,.h -o concatenated_files_output.txt -t src,include
-# concat.sh -e .py -o concatenated_files_output.txt -x .venv,venv -t .
+#   ./concat.sh -e .c,.h -o concatenated_output.txt -t src include
+#   ./concat.sh -e .py -o all_py.txt -x .venv,node_modules -t .
 
 # Default settings
 TREE_CMD="tree"
@@ -66,59 +65,78 @@ for arg in "$@"; do
   TARGET_DIRS+=("$arg")
 done
 
-# Build an array that represents: ( -path "*/dirA" -o -path "*/dirB" ) -prune -o
-# or empty if no excludes
-build_prune_array() {
-  local -n _out_array=$1
-  _out_array=()
+# Ensure parent directory of OUTPUT exists
+OUTPUT_PARENT="$(dirname "$OUTPUT")"
+if [ "$OUTPUT_PARENT" != "." ]; then
+  mkdir -p "$OUTPUT_PARENT"
+fi
 
+# Prevent including the output file in the find results by pruning it
+OUTPUT_BASENAME="$(basename "$OUTPUT")"
+EXCLUDE_DIRS+=("$OUTPUT_BASENAME")
+
+# Build an array of lines to be used as prune expressions.
+# Each line printed is one element of the future prune array.
+build_prune_array() {
+  local tmp=()
   if [ "${#EXCLUDE_DIRS[@]}" -eq 0 ]; then
+    printf '%s\n' "${tmp[@]}"
     return
   fi
 
-  # start a parenthesized group
-  _out_array+=( "(" )
+  tmp+=( "(" )
   for d in "${EXCLUDE_DIRS[@]}"; do
-    _out_array+=( -path "*/$d" -o )
+    tmp+=( -path "*/$d" -o )
   done
-  unset '_out_array[${#_out_array[@]}-1]'  # remove trailing -o
-  _out_array+=( ")" "-prune" "-o" )
+  unset 'tmp[${#tmp[@]}-1]'  # remove trailing -o
+  tmp+=( ")" "-prune" "-o" )
+
+  printf '%s\n' "${tmp[@]}"
 }
 
-# Build an array for: ( -iname "*ext1" -o -iname "*ext2" )
-# This goes right after -type f in the find command.
+# Build an array of lines to be used as extension-matching expressions.
+# If EXTENSIONS contains a single empty string, we treat it as "match all" (i.e. no filter).
 build_ext_array() {
-  local -n _out_array=$1
-  _out_array=()
+  local tmp=()
+  if [ "${#EXTENSIONS[@]}" -eq 1 ] && [ -z "${EXTENSIONS[0]}" ]; then
+    # No extension filtering
+    printf '%s\n' "${tmp[@]}"
+    return
+  fi
 
   for ext in "${EXTENSIONS[@]}"; do
-    _out_array+=( -iname "*$ext" -o )
+    # Make sure ext starts with a dot; if not, prepend it
+    if [[ "$ext" != .* ]]; then
+      ext=".$ext"
+    fi
+    tmp+=( -iname "*$ext" -o )
   done
-  unset '_out_array[${#_out_array[@]}-1]'  # remove trailing -o
+  unset 'tmp[${#tmp[@]}-1]'  # remove trailing -o
+
+  printf '%s\n' "${tmp[@]}"
 }
 
-# Print a tree (skipping excluded dirs) for one directory
+# Print a directory tree for one directory, skipping excluded names
 print_tree() {
   local dir="$1"
   echo "Directory structure for: $dir"
   if command -v "$TREE_CMD" &>/dev/null; then
-    # Pass each exclude to tree as -I
     local IARGS=()
     for d in "${EXCLUDE_DIRS[@]}"; do
       IARGS+=( -I "$d" )
     done
     "$TREE_CMD" "${IARGS[@]}" "$dir"
   else
-    # Fallback: use find + sed
-    local prune_arr=()
-    build_prune_array prune_arr
-    (cd "$dir" && find . "${prune_arr[@]}" -print | \
+    # Fallback: use find + sed, but only show directories (omit files)
+    local prune_lines
+    IFS=$'\n' read -r -d '' -a prune_lines < <(build_prune_array && printf '\0')
+    (cd "$dir" && find . "${prune_lines[@]}" -type d -print | \
       sed -e 's;[^/]*/;|___;g;s;___|; |;g')
   fi
   echo ""
 }
 
-# Write header (tree + file contents) to output
+# Write header (tree + file contents) to the output file
 {
   if [ "$PRINT_TREE" = true ]; then
     echo "--- Directory Trees ---"
@@ -130,24 +148,35 @@ print_tree() {
   echo ""
 } > "$OUTPUT"
 
-# Now loop over each target dir and append matching files
+# Main loop: find matching files under each target dir, skipping pruned paths
 for d in "${TARGET_DIRS[@]}"; do
-  # Build prune array and extension array for this iteration
-  prune_arr=()
-  build_prune_array prune_arr
+  # Build prune array for this directory
+  IFS=$'\n' read -r -d '' -a prune_arr < <(build_prune_array && printf '\0')
 
-  ext_arr=()
-  build_ext_array ext_arr
+  # Build extension array for this directory
+  IFS=$'\n' read -r -d '' -a ext_arr < <(build_ext_array && printf '\0')
 
-  # Now call find without eval:
-  # find "$d" "${prune_arr[@]}" -type f "(" "${ext_arr[@]}" ")" -print0
-  find "$d" "${prune_arr[@]}" -type f "(" "${ext_arr[@]}" ")" -print0 | \
+  # Construct find command arguments step by step:
+  find_args=( "$d" )
+  if [ "${#prune_arr[@]}" -gt 0 ]; then
+    find_args+=( "${prune_arr[@]}" )
+  fi
+
+  find_args+=( -type f )
+  if [ "${#ext_arr[@]}" -gt 0 ]; then
+    find_args+=( "(" "${ext_arr[@]}" ")" )
+  fi
+
+  find_args+=( -print0 )
+
+  # Execute find and append each file's contents
+  find "${find_args[@]}" | \
     while IFS= read -r -d '' file; do
       {
         echo "----- Begin: $file -----"
         cat "$file"
         echo ""
-        echo "----- End: $file -----"
+        echo "-----  End: $file  -----"
         echo ""
       } >> "$OUTPUT"
     done
