@@ -10,7 +10,7 @@
     autocrlf = input # Convert CRLF to LF on commit for cross-platform compatibility
     excludesfile = ~/.gitignore_global # Path to global .gitignore file
     longpaths = true # Enable support for long paths on Windows
-    hooksPath = ~/.githooks # Set a global hooks path
+    #hooksPath = ~/.githooks # Set a global hooks path
 
 [color]
     ui = auto # Enable colorized output for Git commands
