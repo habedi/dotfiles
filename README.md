@@ -5,11 +5,11 @@ It includes configurations for the following programs:
 
 - **Python-related files**
     - [pyproject.toml](pyproject.toml)
-- [**Git-related files**](git)
-- [**Useful scripts**](scripts)
+- [Git-related files](git)
+- [Useful scripts](scripts)
 - **Editor configurations**
     - [editorconfig](.editorconfig)
-- **AI agent Skills**
+- **AI agent skills**
     - [slopify](skills/slopify/SKILL.md)
 
 ### License
