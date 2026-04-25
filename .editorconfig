@@ -10,10 +10,10 @@ indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.py]
+[*.{py,js}]
 max_line_length = 100
 
-[*.md]
+[*.{md,html,css}]
 trim_trailing_whitespace = false
 max_line_length = 150
 
