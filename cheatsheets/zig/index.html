@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zig 0.16.0 Cheatsheet</title>
+<style>
+  :root {
+    --bg: #1a1b26;
+    --panel: #24283b;
+    --fg: #c0caf5;
+    --muted: #7a88cf;
+    --accent: #f7a41d;
+    --accent-2: #7aa2f7;
+    --border: #414868;
+    --code-bg: #16161e;
+    --kw: #bb9af7;
+    --str: #9ece6a;
+    --num: #ff9e64;
+    --com: #565f89;
+    --typ: #2ac3de;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #fafafa;
+      --panel: #ffffff;
+      --fg: #1a1a1a;
+      --muted: #555;
+      --accent: #c47600;
+      --accent-2: #2a5db0;
+      --border: #d0d0d0;
+      --code-bg: #f0f0f0;
+      --kw: #8e44ad;
+      --str: #2e7d32;
+      --num: #c0392b;
+      --com: #888;
+      --typ: #1565c0;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+  }
+  header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  header h1 { margin: 0; font-size: 1.6rem; color: var(--accent); }
+  header .meta { color: var(--muted); font-size: 0.9rem; }
+  main {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+  }
+  section h2 {
+    margin: 0 0 0.6rem;
+    font-size: 1rem;
+    color: var(--accent-2);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.3rem;
+  }
+  pre, code {
+    font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 0.5rem 0;
+    border: 1px solid var(--border);
+  }
+  p code, li code {
+    background: var(--code-bg);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+  }
+  ul { padding-left: 1.2rem; margin: 0.4rem 0; }
+  li { margin: 0.2rem 0; }
+  .k { color: var(--kw); }
+  .s { color: var(--str); }
+  .n { color: var(--num); }
+  .c { color: var(--com); font-style: italic; }
+  .t { color: var(--typ); }
+  footer {
+    padding: 1rem 2rem 2rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  a { color: var(--accent-2); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Zig 0.16.0 Cheatsheet</h1>
+  <div class="meta">Quick reference &middot; <a href="https://ziglang.org/documentation/0.16.0/">official docs</a></div>
+</header>
+<main>
+
+<section>
+<h2>Hello, World</h2>
+<pre><span class="k">const</span> std = <span class="k">@import</span>(<span class="s">"std"</span>);
+
+<span class="k">pub fn</span> main() !<span class="k">void</span> {
+    <span class="k">const</span> stdout = std.io.getStdOut().writer();
+    <span class="k">try</span> stdout.print(<span class="s">"Hello, {s}!\n"</span>, .{<span class="s">"world"</span>});
+}</pre>
+<p>Build &amp; run: <code>zig run hello.zig</code> &middot; Compile: <code>zig build-exe hello.zig</code></p>
+</section>
+
+<section>
+<h2>Variables &amp; Constants</h2>
+<pre><span class="k">const</span> pi: f64 = <span class="n">3.14159</span>;     <span class="c">// immutable</span>
+<span class="k">var</span> count: u32 = <span class="n">0</span>;          <span class="c">// mutable</span>
+count += <span class="n">1</span>;
+
+<span class="k">const</span> inferred = <span class="n">42</span>;         <span class="c">// comptime_int</span>
+<span class="k">var</span> array = [_]u8{ <span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span> };
+
+<span class="k">const</span> Point = <span class="k">struct</span> { x: f32, y: f32 };
+<span class="k">var</span> p = Point{ .x = <span class="n">1.0</span>, .y = <span class="n">2.0</span> };</pre>
+</section>
+
+<section>
+<h2>Primitive Types</h2>
+<ul>
+  <li>Signed: <code>i8 i16 i32 i64 i128 isize</code></li>
+  <li>Unsigned: <code>u8 u16 u32 u64 u128 usize</code></li>
+  <li>Arbitrary width: <code>i7</code>, <code>u3</code>, ... up to <code>u65535</code></li>
+  <li>Float: <code>f16 f32 f64 f80 f128</code></li>
+  <li>Other: <code>bool</code>, <code>void</code>, <code>noreturn</code>, <code>type</code>, <code>anyopaque</code>, <code>comptime_int</code>, <code>comptime_float</code></li>
+  <li>Strings: <code>[]const u8</code> (slice of bytes, UTF-8 by convention)</li>
+</ul>
+</section>
+
+<section>
+<h2>Control Flow</h2>
+<pre><span class="k">if</span> (x &gt; <span class="n">0</span>) { ... } <span class="k">else if</span> (x == <span class="n">0</span>) { ... } <span class="k">else</span> { ... }
+
+<span class="k">while</span> (i &lt; <span class="n">10</span>) : (i += <span class="n">1</span>) { ... }
+
+<span class="k">for</span> (items, <span class="n">0</span>..) |item, i| {
+    std.debug.print(<span class="s">"{d}: {}\n"</span>, .{ i, item });
+}
+
+<span class="k">switch</span> (x) {
+    <span class="n">0</span> =&gt; { ... },
+    <span class="n">1</span>...<span class="n">9</span> =&gt; { ... },
+    <span class="k">else</span> =&gt; { ... },
+}</pre>
+</section>
+
+<section>
+<h2>Optionals</h2>
+<pre><span class="k">var</span> maybe: ?u32 = <span class="k">null</span>;
+maybe = <span class="n">7</span>;
+
+<span class="k">if</span> (maybe) |val| {
+    std.debug.print(<span class="s">"got {}\n"</span>, .{val});
+} <span class="k">else</span> {
+    std.debug.print(<span class="s">"none\n"</span>, .{});
+}
+
+<span class="k">const</span> x = maybe <span class="k">orelse</span> <span class="n">0</span>;
+<span class="k">const</span> y = maybe.?;            <span class="c">// panic on null</span></pre>
+</section>
+
+<section>
+<h2>Errors</h2>
+<pre><span class="k">const</span> ParseError = <span class="k">error</span>{ Empty, Invalid };
+
+<span class="k">fn</span> parse(s: []<span class="k">const</span> u8) ParseError!u32 {
+    <span class="k">if</span> (s.len == <span class="n">0</span>) <span class="k">return error</span>.Empty;
+    <span class="k">return</span> std.fmt.parseInt(u32, s, <span class="n">10</span>) <span class="k">catch</span> <span class="k">return error</span>.Invalid;
+}
+
+<span class="k">const</span> n = <span class="k">try</span> parse(<span class="s">"42"</span>);          <span class="c">// propagate</span>
+<span class="k">const</span> m = parse(<span class="s">"x"</span>) <span class="k">catch</span> <span class="n">0</span>;      <span class="c">// default</span>
+parse(<span class="s">"x"</span>) <span class="k">catch</span> |err| { ... };  <span class="c">// inspect</span></pre>
+</section>
+
+<section>
+<h2>Functions</h2>
+<pre><span class="k">fn</span> add(a: i32, b: i32) i32 {
+    <span class="k">return</span> a + b;
+}
+
+<span class="k">pub fn</span> max(<span class="k">comptime</span> T: <span class="k">type</span>, a: T, b: T) T {
+    <span class="k">return if</span> (a &gt; b) a <span class="k">else</span> b;
+}
+
+<span class="c">// variadic via anytype</span>
+<span class="k">fn</span> log(<span class="k">comptime</span> fmt: []<span class="k">const</span> u8, args: <span class="k">anytype</span>) <span class="k">void</span> {
+    std.debug.print(fmt, args);
+}</pre>
+</section>
+
+<section>
+<h2>Arrays, Slices, Pointers</h2>
+<pre><span class="k">const</span> arr = [_]i32{ <span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span> };  <span class="c">// [4]i32</span>
+<span class="k">const</span> slice: []<span class="k">const</span> i32 = arr[<span class="n">1</span>..<span class="n">3</span>];  <span class="c">// {2, 3}</span>
+<span class="k">const</span> len = slice.len;
+
+<span class="k">var</span> x: i32 = <span class="n">10</span>;
+<span class="k">const</span> p: *i32 = &amp;x;
+p.* = <span class="n">20</span>;
+
+<span class="c">// many-item pointer</span>
+<span class="k">const</span> mp: [*]<span class="k">const</span> u8 = arr[<span class="n">0</span>..].ptr;</pre>
+</section>
+
+<section>
+<h2>Structs &amp; Methods</h2>
+<pre><span class="k">const</span> <span class="t">Vec2</span> = <span class="k">struct</span> {
+    x: f32,
+    y: f32,
+
+    <span class="k">pub fn</span> init(x: f32, y: f32) <span class="t">Vec2</span> {
+        <span class="k">return</span> .{ .x = x, .y = y };
+    }
+
+    <span class="k">pub fn</span> length(self: <span class="t">Vec2</span>) f32 {
+        <span class="k">return</span> <span class="k">@sqrt</span>(self.x * self.x + self.y * self.y);
+    }
+};
+
+<span class="k">const</span> v = <span class="t">Vec2</span>.init(<span class="n">3</span>, <span class="n">4</span>);
+<span class="k">const</span> n = v.length();</pre>
+</section>
+
+<section>
+<h2>Enums &amp; Tagged Unions</h2>
+<pre><span class="k">const</span> <span class="t">Color</span> = <span class="k">enum</span> { red, green, blue };
+<span class="k">const</span> c: <span class="t">Color</span> = .red;
+
+<span class="k">const</span> <span class="t">Shape</span> = <span class="k">union</span>(<span class="k">enum</span>) {
+    circle: f32,
+    rect: <span class="k">struct</span> { w: f32, h: f32 },
+    point,
+};
+
+<span class="k">const</span> s = <span class="t">Shape</span>{ .circle = <span class="n">2.0</span> };
+<span class="k">switch</span> (s) {
+    .circle =&gt; |r| { ... },
+    .rect =&gt; |r| { ... },
+    .point =&gt; { ... },
+}</pre>
+</section>
+
+<section>
+<h2>Allocators</h2>
+<pre><span class="k">const</span> std = <span class="k">@import</span>(<span class="s">"std"</span>);
+
+<span class="k">pub fn</span> main() !<span class="k">void</span> {
+    <span class="k">var</span> gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    <span class="k">defer</span> _ = gpa.deinit();
+    <span class="k">const</span> alloc = gpa.allocator();
+
+    <span class="k">const</span> buf = <span class="k">try</span> alloc.alloc(u8, <span class="n">1024</span>);
+    <span class="k">defer</span> alloc.free(buf);
+
+    <span class="k">var</span> list = std.ArrayList(u32).init(alloc);
+    <span class="k">defer</span> list.deinit();
+    <span class="k">try</span> list.append(<span class="n">42</span>);
+}</pre>
+<p>Common allocators: <code>GeneralPurposeAllocator</code>, <code>ArenaAllocator</code>, <code>FixedBufferAllocator</code>, <code>page_allocator</code>, <code>c_allocator</code>.</p>
+</section>
+
+<section>
+<h2>Comptime &amp; Generics</h2>
+<pre><span class="k">fn</span> List(<span class="k">comptime</span> T: <span class="k">type</span>) <span class="k">type</span> {
+    <span class="k">return struct</span> {
+        items: []T,
+        len: usize,
+    };
+}
+
+<span class="k">const</span> IntList = List(i32);
+
+<span class="k">comptime</span> {
+    <span class="k">const</span> n = <span class="n">10</span> * <span class="n">10</span>;
+    <span class="k">@compileLog</span>(<span class="s">"computed at compile time"</span>, n);
+}</pre>
+</section>
+
+<section>
+<h2>Defer &amp; Errdefer</h2>
+<pre><span class="k">fn</span> work(alloc: std.mem.Allocator) ![]u8 {
+    <span class="k">const</span> buf = <span class="k">try</span> alloc.alloc(u8, <span class="n">64</span>);
+    <span class="k">errdefer</span> alloc.free(buf);  <span class="c">// only on error</span>
+
+    <span class="k">try</span> doSomething(buf);
+    <span class="k">return</span> buf;                <span class="c">// caller owns it</span>
+}
+
+<span class="k">defer</span> file.close();          <span class="c">// always runs on scope exit</span></pre>
+</section>
+
+<section>
+<h2>Builtins (selected)</h2>
+<ul>
+  <li><code>@import</code>, <code>@cImport</code>, <code>@embedFile</code></li>
+  <li><code>@as</code>, <code>@intCast</code>, <code>@floatCast</code>, <code>@ptrCast</code>, <code>@bitCast</code></li>
+  <li><code>@sizeOf</code>, <code>@alignOf</code>, <code>@typeInfo</code>, <code>@TypeOf</code>, <code>@typeName</code></li>
+  <li><code>@min</code>, <code>@max</code>, <code>@abs</code>, <code>@sqrt</code>, <code>@mod</code>, <code>@rem</code></li>
+  <li><code>@memcpy</code>, <code>@memset</code>, <code>@splat</code>, <code>@reduce</code></li>
+  <li><code>@panic</code>, <code>@compileError</code>, <code>@compileLog</code></li>
+</ul>
+</section>
+
+<section>
+<h2>Build System (build.zig)</h2>
+<pre><span class="k">const</span> std = <span class="k">@import</span>(<span class="s">"std"</span>);
+
+<span class="k">pub fn</span> build(b: *std.Build) <span class="k">void</span> {
+    <span class="k">const</span> target = b.standardTargetOptions(.{});
+    <span class="k">const</span> optimize = b.standardOptimizeOption(.{});
+
+    <span class="k">const</span> exe = b.addExecutable(.{
+        .name = <span class="s">"app"</span>,
+        .root_source_file = b.path(<span class="s">"src/main.zig"</span>),
+        .target = target,
+        .optimize = optimize,
+    });
+    b.installArtifact(exe);
+
+    <span class="k">const</span> run = b.addRunArtifact(exe);
+    <span class="k">const</span> step = b.step(<span class="s">"run"</span>, <span class="s">"Run the app"</span>);
+    step.dependOn(&amp;run.step);
+}</pre>
+<p>Commands: <code>zig build</code>, <code>zig build run</code>, <code>zig build test</code>, <code>zig build -Doptimize=ReleaseFast</code>.</p>
+</section>
+
+<section>
+<h2>Testing</h2>
+<pre><span class="k">const</span> std = <span class="k">@import</span>(<span class="s">"std"</span>);
+<span class="k">const</span> testing = std.testing;
+
+<span class="k">test</span> <span class="s">"basic add"</span> {
+    <span class="k">try</span> testing.expectEqual(<span class="n">4</span>, <span class="n">2</span> + <span class="n">2</span>);
+}
+
+<span class="k">test</span> <span class="s">"slice equal"</span> {
+    <span class="k">try</span> testing.expectEqualSlices(u8, <span class="s">"hi"</span>, <span class="s">"hi"</span>);
+}</pre>
+<p>Run with <code>zig test file.zig</code> or <code>zig build test</code>.</p>
+</section>
+
+<section>
+<h2>Concurrency</h2>
+<pre><span class="c">// async/await was removed in 0.11; threads are the primary primitive.</span>
+<span class="k">const</span> std = <span class="k">@import</span>(<span class="s">"std"</span>);
+
+<span class="k">fn</span> worker(id: u32) <span class="k">void</span> {
+    std.debug.print(<span class="s">"worker {}\n"</span>, .{id});
+}
+
+<span class="k">pub fn</span> main() !<span class="k">void</span> {
+    <span class="k">const</span> t = <span class="k">try</span> std.Thread.spawn(.{}, worker, .{<span class="n">1</span>});
+    t.join();
+}</pre>
+<p>Sync: <code>std.Thread.Mutex</code>, <code>RwLock</code>, <code>Condition</code>, <code>std.atomic.Value(T)</code>.</p>
+</section>
+
+<section>
+<h2>C Interop</h2>
+<pre><span class="k">const</span> c = <span class="k">@cImport</span>({
+    <span class="k">@cInclude</span>(<span class="s">"stdio.h"</span>);
+});
+
+<span class="k">pub fn</span> main() <span class="k">void</span> {
+    _ = c.printf(<span class="s">"hello from C\n"</span>);
+}</pre>
+<p>Link C: <code>zig build-exe main.zig -lc</code>. Use <code>extern fn</code> to declare external symbols.</p>
+</section>
+
+<section>
+<h2>Common Std Modules</h2>
+<ul>
+  <li><code>std.fmt</code> &mdash; formatting / parsing</li>
+  <li><code>std.fs</code> &mdash; filesystem</li>
+  <li><code>std.io</code> &mdash; readers / writers</li>
+  <li><code>std.mem</code> &mdash; slices, allocators, comparisons</li>
+  <li><code>std.ArrayList(T)</code>, <code>std.AutoHashMap(K,V)</code>, <code>std.StringHashMap(V)</code></li>
+  <li><code>std.json</code>, <code>std.http</code>, <code>std.crypto</code></li>
+  <li><code>std.process</code>, <code>std.os</code>, <code>std.time</code>, <code>std.log</code>, <code>std.testing</code></li>
+</ul>
+</section>
+
+</main>
+<footer>
+  Zig 0.16.0 quick reference. Always cross-check against the official language reference and std docs.
+</footer>
+</body>
+</html>

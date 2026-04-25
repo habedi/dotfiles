@@ -11,6 +11,9 @@ It includes configurations for the following programs:
     - [editorconfig](.editorconfig)
 - **AI agent skills**
     - [slopify](skills/slopify/SKILL.md)
+- **Cheatsheets**
+    - [Zig 0.16.0](https://habedi.github.io/dotfiles/cheatsheets/zig/index.html)
+    - [Rust (stable)](https://habedi.github.io/dotfiles/cheatsheets/rust/index.html)
 
 ### License
 

@@ -5,8 +5,18 @@ description: Lower the quality of a codebase so it reads like the output of an u
 
 # Slopify
 
-A skill for turning a project into something that looks like an unsupervised AI agent made. The goal is that the "after" should look (recognisably)
-sloppy next to the "before", without being broken, unsafe, not runnable.
+A skill for turning a project into something that looks like an unsupervised AI agent made.
+The goal is that the project "after being slopified" should look (recognisably) sloppy next to the "before being slopified", without being broken,
+unsafe, or not runnable.
+
+## Contents
+
+- Usage and slop levels: subtle, moderate, and maximum
+- Core patterns: 14 stylistic moves to apply
+- Patterns by file type: READMEs, source, tests, commits, and config
+- Voice markers: phrases and tone for slop prose
+- Example transformations: before/after pairs
+- What not to do: safety boundaries
 
 ## How to use this skill
 
