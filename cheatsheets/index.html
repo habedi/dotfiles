@@ -8,66 +8,106 @@
   :root {
     --bg: #1a1b26;
     --panel: #24283b;
+    --panel-hi: #2a2f45;
     --fg: #c0caf5;
-    --muted: #7a88cf;
+    --fg-strong: #e6eaff;
+    --muted: #8a96d4;
     --accent: #7aa2f7;
-    --border: #414868;
+    --border: #353a52;
+    --shadow: 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px rgba(0,0,0,0.25);
   }
   @media (prefers-color-scheme: light) {
     :root {
-      --bg: #fafafa;
+      --bg: #f7f8fb;
       --panel: #ffffff;
-      --fg: #1a1a1a;
-      --muted: #555;
+      --panel-hi: #f1f3f9;
+      --fg: #1c1f2a;
+      --fg-strong: #0a0c14;
+      --muted: #5b6275;
       --accent: #2a5db0;
-      --border: #d0d0d0;
+      --border: #e2e5ec;
+      --shadow: 0 1px 2px rgba(20,30,60,0.04), 0 4px 14px rgba(20,30,60,0.06);
     }
   }
+  * { box-sizing: border-box; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
     background: var(--bg);
     color: var(--fg);
-    line-height: 1.5;
+    line-height: 1.55;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
   }
-  main {
-    max-width: 640px;
-    width: 100%;
+  main { max-width: 720px; width: 100%; }
+  h1 {
+    color: var(--fg-strong);
+    margin: 0 0 0.2rem;
+    font-size: 1.7rem;
+    letter-spacing: -0.01em;
   }
-  h1 { color: var(--accent); margin-bottom: 0.2rem; }
-  p { color: var(--muted); margin-top: 0; }
-  ul { list-style: none; padding: 0; }
-  li {
-    margin: 0.6rem 0;
+  p.lede { color: var(--muted); margin: 0 0 1.5rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.9rem;
   }
   a.card {
     display: block;
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    padding: 1.1rem 1.2rem;
     color: var(--fg);
     text-decoration: none;
-    transition: border-color 0.15s;
+    transition: transform 0.12s ease, border-color 0.15s, box-shadow 0.15s;
+    box-shadow: var(--shadow);
   }
-  a.card:hover { border-color: var(--accent); }
-  a.card strong { color: var(--accent); display: block; margin-bottom: 0.2rem; }
-  a.card span { color: var(--muted); font-size: 0.9rem; }
+  a.card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  a.card .title {
+    color: var(--accent);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  a.card .title .ver {
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--panel-hi);
+    border: 1px solid var(--border);
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    font-weight: 400;
+  }
+  a.card .desc { color: var(--muted); font-size: 0.88rem; }
+  footer { color: var(--muted); font-size: 0.8rem; margin-top: 2rem; text-align: center; }
+  footer a { color: var(--accent); }
 </style>
 </head>
 <body>
 <main>
   <h1>Cheatsheets</h1>
-  <p>Single-page quick references.</p>
-  <ul>
-    <li><a class="card" href="zig/"><strong>Zig 0.16.0</strong><span>syntax, allocators, build system, std library</span></a></li>
-    <li><a class="card" href="rust/"><strong>Rust (stable)</strong><span>ownership, traits, async, cargo, std library</span></a></li>
-  </ul>
+  <p class="lede">Single-page quick references with collapsible deep-dive examples.</p>
+  <div class="grid">
+    <a class="card" href="zig/">
+      <div class="title">Zig <span class="ver">0.16.0</span></div>
+      <div class="desc">Syntax, optionals/errors, comptime, allocators, build system, std library, C interop.</div>
+    </a>
+    <a class="card" href="rust/">
+      <div class="title">Rust <span class="ver">stable</span></div>
+      <div class="desc">Ownership &amp; borrowing, traits/generics, iterators, async/tokio, cargo, error handling.</div>
+    </a>
+  </div>
+  <footer>Source on <a href="https://github.com/habedi/dotfiles">GitHub</a>.</footer>
 </main>
 </body>
 </html>

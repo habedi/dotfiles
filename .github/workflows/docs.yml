@@ -24,8 +24,9 @@ jobs:
 
       - name: Stage Site
         run: |
-          mkdir -p site
-          cp -r cheatsheets/. site/
+          mkdir -p site/cheatsheets
+          cp -r cheatsheets/. site/cheatsheets/
+          cp cheatsheets/index.html site/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
