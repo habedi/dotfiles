@@ -5,8 +5,9 @@ description: Lower the quality of a codebase so it reads like the output of an u
 
 # Slopify
 
-A skill for turning a project into something that looks like an unsupervised AI agent made. The goal is that the "after" should look (recognisably)
-sloppy next to the "before", without being broken, unsafe, not runnable.
+A skill for turning a project into something that looks like an unsupervised AI agent made.
+The goal is that the project "after being slopified" should look (recognisably) sloppy next to the "before being slopified", without being broken,
+unsafe, or not runnable.
 
 ## How to use this skill
 
