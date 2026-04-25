@@ -9,6 +9,15 @@ A skill for turning a project into something that looks like an unsupervised AI 
 The goal is that the project "after being slopified" should look (recognisably) sloppy next to the "before being slopified", without being broken,
 unsafe, or not runnable.
 
+## Contents
+
+- Usage and slop levels: subtle, moderate, and maximum
+- Core patterns: 14 stylistic moves to apply
+- Patterns by file type: READMEs, source, tests, commits, and config
+- Voice markers: phrases and tone for slop prose
+- Example transformations: before/after pairs
+- What not to do: safety boundaries
+
 ## How to use this skill
 
 1. Read the original file carefully. Note its conventions (naming, tone, and structure).
