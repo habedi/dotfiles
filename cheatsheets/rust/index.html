@@ -312,6 +312,62 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--border-hi); }
+
+  .print-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 0.8rem;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .print-btn:hover { border-color: var(--accent-2); color: var(--fg-strong); }
+
+  @media print {
+    body { background: #fff; color: #111; font-size: 10pt; }
+    header.top, nav.toc, .search, .links, .top-spacer, .print-btn, footer { display: none !important; }
+    .layout { display: block; max-width: none; padding: 0; gap: 0; }
+    main { min-width: 0; }
+    .intro { margin-bottom: 0.5cm; box-shadow: none; border-color: #ccc; }
+    section {
+      box-shadow: none;
+      border-color: #ccc;
+      margin-bottom: 0.4cm;
+      padding: 0.35cm 0.45cm;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    section h2 { color: #000; }
+    section h2::before { background: #888; }
+    pre, code, td code, p code, li code {
+      background: #f5f5f5;
+      border-color: #ddd;
+      color: #111;
+    }
+    pre { page-break-inside: avoid; break-inside: avoid; }
+    .k, .s, .n, .c, .t, .m { color: #111 !important; }
+    .c { color: #555 !important; }
+    table { page-break-inside: auto; }
+    tr  { page-break-inside: avoid; break-inside: avoid; }
+    th  { color: #555; }
+    a { color: #000; text-decoration: none; }
+    details.more { border-top-color: #ccc; padding-top: 0.4rem; }
+    details.more > summary { display: none; }
+    .pill { border-color: #ccc; color: #555; background: #f5f5f5; }
+    @page { margin: 1.2cm; }
+    main::before {
+      content: "Rust (stable) Cheatsheet";
+      display: block;
+      font-size: 14pt;
+      font-weight: 600;
+      color: #000;
+      margin-bottom: 0.4cm;
+    }
+  }
 </style>
 </head>
 <body>
@@ -331,6 +387,7 @@
       <a href="https://doc.rust-lang.org/std/" target="_blank" rel="noopener">std</a>
       <a href="https://doc.rust-lang.org/reference/" target="_blank" rel="noopener">Reference</a>
       <a href="../">All sheets</a>
+      <button id="print-btn" class="print-btn" type="button" title="Open print dialog. Choose “Save as PDF” to export.">PDF</button>
     </div>
   </div>
 </header>
@@ -1142,6 +1199,22 @@ resolver = <span class="s">"2"</span></pre>
       applyFilter();
       input.blur();
     }
+  });
+
+  // Print / Save as PDF: expand every <details> so the full content prints,
+  // restore each one's prior state afterwards.
+  const printBtn = document.getElementById('print-btn');
+  if (printBtn) printBtn.addEventListener('click', () => window.print());
+  let prevOpen = null;
+  window.addEventListener('beforeprint', () => {
+    const ds = document.querySelectorAll('details.more');
+    prevOpen = Array.from(ds).map(d => d.open);
+    ds.forEach(d => { d.open = true; });
+  });
+  window.addEventListener('afterprint', () => {
+    if (!prevOpen) return;
+    document.querySelectorAll('details.more').forEach((d, i) => { d.open = prevOpen[i]; });
+    prevOpen = null;
   });
 })();
 </script>
