@@ -19,16 +19,16 @@ jobs:
   deploy-docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Stage Site
+      - name: Stage site
         run: |
           mkdir -p site/cheatsheets
           cp -r cheatsheets/. site/cheatsheets/
           cp cheatsheets/index.html site/index.html
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy to GitHub pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
