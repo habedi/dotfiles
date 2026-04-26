@@ -1,5 +1,5 @@
-site_name: Dotfiles
-site_description: Personal dotfiles, scripts, and language cheatsheets
+site_name: My Dotfiles
+site_description: Personal configurations, scripts, technical notes, etc.
 repo_url: https://github.com/habedi/dotfiles
 repo_name: habedi/dotfiles
 site_url: https://habedi.github.io/dotfiles/
@@ -44,8 +44,8 @@ plugins:
 
 nav:
   - Home: index.md
-  - Zig 0.16.0: zig.md
-  - Rust (stable): rust.md
+  - Zig: zig.md
+  - Rust: rust.md
 
 markdown_extensions:
   - pymdownx.highlight:

@@ -1,8 +1,8 @@
-# Rust Cheatsheet
+# Notes on Rust
 
-Quick reference for **Rust** stable. Rust is a general-purpose programming language with memory and thread safety enforced at compile time via ownership and borrowing: no GC, no null, no data races. The standard toolchain is `rustup`, `cargo`, `rustc`, `rustfmt`, and `clippy`.
+Quick reference for Rust stable. Rust is a general-purpose programming language with memory and thread safety enforced at compile time via ownership and borrowing: no GC, no null, no data races. The standard toolchain is `rustup`, `cargo`, `rustc`, `rustfmt`, and `clippy`.
 
-Each section has a core idiom; expand the **More examples** blocks for extended snippets.
+Each section has a core idiom; expand the _More examples_ blocks for extended snippets.
 
 ## Hello World and Toolchain
 
@@ -35,10 +35,10 @@ fn main() {
 Bindings are immutable by default. Shadowing lets you reuse a name with a new type.
 
 ```rust
-let x = 5;                  // immutable
-let mut y: i32 = 10;        // mutable
+let x = 5;                  // Immutable
+let mut y: i32 = 10;        // Mutable
 y += 1;
-const MAX: u32 = 100;        // compile-time constant, ALL_CAPS
+const MAX: u32 = 100;        // Compile-time constant, ALL_CAPS
 static NAME: &str = "app";   // 'static lifetime, single location
 
 let (a, b) = (1, 2);
@@ -49,17 +49,17 @@ let shadow: i32 = shadow.parse().unwrap();
 ??? example "More examples"
 
     ```rust title="destructuring patterns"
-    let [first, .., last] = arr;             // fixed-size array
-    let Point { x, y: yy } = p;               // rename
-    let &[first, ..] = items else { return; }; // slice pattern + let-else
-    if let Ok(42) = parse("42") { ... }      // pattern + guard
+    let [first, .., last] = arr;             // Fixed-size array
+    let Point { x, y: yy } = p;               // Rename
+    let &[first, ..] = items else { return; }; // Slice pattern + let-else
+    if let Ok(42) = parse("42") { ... }      // Pattern + guard
     ```
 
     ```rust title="numeric suffixes & literals"
     let a = 42_i64;
     let b = 3.14_f32;
     let c = 0xFF_u8; let d = 0b1010; let e = 0o17;
-    let million = 1_000_000;            // underscores allowed
+    let million = 1_000_000;            // Underscores allowed
     ```
 
 ## Primitive Types
@@ -80,9 +80,9 @@ Strict, but small. The big distinction is owned vs borrowed (`String` vs `&str`,
 
     ```rust title="conversion idioms"
     let a: i32 = 100;
-    let b = a as i64;                 // widening, lossy on narrowing
-    let c: i64 = a.into();              // safe widening
-    let d = i16::try_from(a).unwrap();  // fallible narrowing
+    let b = a as i64;                 // Widening, lossy on narrowing
+    let c: i64 = a.into();              // Safe widening
+    let d = i16::try_from(a).unwrap();  // Fallible narrowing
 
     let n: i32 = "42".parse()?;
     let s: String = 42.to_string();
@@ -175,17 +175,17 @@ Every value has exactly one owner. Borrows are checked at compile time. Either m
 
 ```rust
 let s = String::from("hi");
-let t = s;            // move; s no longer usable
+let t = s;            // Move; s no longer usable
 
 let a = String::from("hi");
-let r = &a;            // shared borrow
+let r = &a;            // Shared borrow
 println!("{a} {r}");
 
 let mut v = vec![1, 2, 3];
-let m = &mut v;       // exclusive borrow
+let m = &mut v;       // Exclusive borrow
 m.push(4);
 
-let c = a.clone();      // deep copy when needed
+let c = a.clone();      // Deep copy when needed
 ```
 
 ??? example "More examples"
@@ -197,7 +197,7 @@ let c = a.clone();      // deep copy when needed
     struct Pixel(u8, u8, u8);
 
     let p = Pixel(1, 2, 3);
-    let q = p;        // p still usable, value was Copy
+    let q = p;        // P still usable, value was Copy
     ```
 
     ```rust title="taking &[T] not &Vec<T>"
@@ -210,7 +210,7 @@ let c = a.clone();      // deep copy when needed
 
     ```rust title="reborrowing"
     fn work(b: &mut Vec<i32>) {
-        helper(b);            // implicit reborrow: b still usable after
+        helper(b);            // Implicit reborrow: b still usable after
         b.push(42);
     }
     ```
@@ -221,14 +221,14 @@ Last expression is the return value. Closures are lambdas that capture their env
 
 ```rust
 fn add(a: i32, b: i32) -> i32 {
-    a + b   // no semicolon = return
+    a + b   // No semicolon = return
 }
 
 let sq = |x: i32| x * x;
 let inc = |x| x + 1;
 let mut count = 0;
 let mut counter = || { count += 1; };  // FnMut
-let own = move || data.clone();        // captures by move
+let own = move || data.clone();        // Captures by move
 ```
 
 ??? example "More examples"
@@ -253,8 +253,8 @@ Structs hold named or positional fields. Enums are sum types where each variant 
 
 ```rust
 struct Point { x: f32, y: f32 }
-struct Pair(i32, i32);             // tuple struct
-struct Marker;                    // unit struct
+struct Pair(i32, i32);             // Tuple struct
+struct Marker;                    // Unit struct
 
 impl Point {
     fn new(x: f32, y: f32) -> Self { Self { x, y } }
@@ -309,7 +309,7 @@ fn parse(s: &str) -> Result<i32, std::num::ParseIntError> {
     s.parse::<i32>()
 }
 
-let n = parse("42")?;             // propagate
+let n = parse("42")?;             // Propagate
 let n = parse("x").unwrap_or(0);
 let n = first(&v).map(|x| x + 1);
 ```
@@ -327,7 +327,7 @@ let n = first(&v).map(|x| x + 1);
 
     ```rust title="? + custom error"
     fn load(path: &str) -> Result<u32, AppError> {
-        let body = std::fs::read_to_string(path)?;     // io::Error -> AppError via From
+        let body = std::fs::read_to_string(path)?;     // Io::Error -> AppError via From
         let n: u32 = body.trim().parse()?;             // ParseIntError -> AppError
         Ok(n)
     }
@@ -365,17 +365,17 @@ fn make() -> impl Greet { En }
 
     ```rust title="associated types vs generics"
     trait Iterator2 {
-        type Item;                            // associated type
+        type Item;                            // Associated type
         fn next(&mut self) -> Option<Self::Item>;
     }
 
-    // vs. generic: caller picks the type instead of the impl
+    // Vs. generic: caller picks the type instead of the impl
     trait From2<T> { fn from2(t: T) -> Self; }
     ```
 
     ```rust title="object safety quick rules"
-    // dyn Trait works only if the trait has no generic methods,
-    // no Self in return position by value, and no associated consts.
+    // Dyn Trait works only if the trait has no generic methods,
+    // No Self in return position by value, and no associated consts.
     ```
 
 ## Common Derives
@@ -392,7 +392,7 @@ struct Config { retries: u32, verbose: bool }
 
 let c = Config::default();
 println!("{c:?}");
-println!("{c:#?}");     // pretty
+println!("{c:#?}");     // Pretty
 ```
 
 ??? example "More examples"
@@ -447,7 +447,7 @@ let s: HashSet<_> = [1, 2, 3].into_iter().collect();
     ```rust title="ordered map"
     let mut bm: BTreeMap<&str, i32> = BTreeMap::new();
     bm.insert("b", 2); bm.insert("a", 1);
-    for (k, v) in &bm { println!("{k}={v}"); }     // sorted
+    for (k, v) in &bm { println!("{k}={v}"); }     // Sorted
     ```
 
 ## Iterators
@@ -489,9 +489,9 @@ let all_pos   = nums.iter().all(|x| *x > 0);
     ```
 
     ```rust title="iter() vs into_iter() vs iter_mut()"
-    // iter()       -> &T
-    // iter_mut()   -> &mut T
-    // into_iter()  -> T (consumes the collection)
+    // Iter()       -> &T
+    // Method iter_mut()   -> &mut T
+    // Method into_iter()  -> T (consumes the collection)
     for x in &v       { /* &T  */ }
     for x in &mut v   { /* &mut T */ }
     for x in v         { /* T (v is moved) */ }
@@ -641,7 +641,7 @@ println!("{}", rx.recv().unwrap());
         s.spawn(|| println!("{:?}", &data));
         s.spawn(|| println!("{}", data.len()));
     });
-    // guarantees all spawned threads finish before scope returns
+    // Guarantees all spawned threads finish before scope returns
     ```
 
     ```rust title="parallel iteration with rayon"
@@ -699,15 +699,15 @@ A _crate_ is a compilation unit. Inside it, `mod` creates a namespace tree. `pub
                 visibility.
 
 ```rust
-// src/lib.rs
-pub mod math;            // loads src/math.rs or src/math/mod.rs
-pub use math::add;       // re-export at crate root
+// Src/lib.rs
+pub mod math;            // Loads src/math.rs or src/math/mod.rs
+pub use math::add;       // Re-export at crate root
 
-// src/math.rs
+// Src/math.rs
 pub fn add(a: i32, b: i32) -> i32 { a + b }
-pub(crate) fn internal() {}  // crate-private
+pub(crate) fn internal() {}  // Crate-private
 
-// using
+// Using
 use mycrate::{add, math::*};
 ```
 
@@ -784,7 +784,7 @@ mod tests {
     fn helper() -> i32 { 1 }
 
     #[cfg(test)]
-    fn dev_helper() -> i32 { 2 }   // only compiled during tests
+    fn dev_helper() -> i32 { 2 }   // Only compiled during tests
     ```
 
 ## Macros
@@ -807,9 +807,9 @@ Macros end with `!`. They’re how Rust handles things that need variadics or sy
 ??? example "More examples"
 
     ```rust title="format directives"
-    println!("{:5}", 42);          // width
-    println!("{:0>5}", 42);        // pad with 0
-    println!("{:.3}", 3.14159);     // precision
+    println!("{:5}", 42);          // Width
+    println!("{:0>5}", 42);        // Pad with 0
+    println!("{:.3}", 3.14159);     // Precision
     println!("{:#x}", 255);          // 0xff
     println!("{name} = {val:?}", name = "x", val = &v);
     ```
@@ -889,10 +889,10 @@ A small map of where things live. The `prelude` brings `Option`, `Result`,
 
 ## Common Gotchas
 
-- **strings** `String` owns; `&str` borrows. Prefer `&str` in args,                     return `String` when you build new content.
-- **cloning** `.clone()` is allowed but not free. If you’re cloning in a hot loop, reconsider                     lifetimes or `Cow`.
-- **unwrap** Avoid `.unwrap()` in production; at least use `.expect("...")` with a                     message that locates the bug.
-- **borrow** “cannot borrow as mutable because it is also borrowed as immutable” usually means you’re holding                     a `&` across a `&mut` call; split the scope.
-- **async** An `async fn` does nothing until `.await`. Forgetting `.await` is                     silently a no-op (clippy warns).
-- **size** Trait objects (`dyn Trait`) are unsized; store behind `Box`,                     `&`, `Arc`, or `Rc`.
-- **orphan** You can implement a trait for a type only if you own one of them; known as the orphan rule.
+- _strings_: `String` owns; `&str` borrows. Prefer `&str` in args,                     return `String` when you build new content.
+- _cloning_: `.clone()` is allowed but not free. If you’re cloning in a hot loop, reconsider                     lifetimes or `Cow`.
+- _unwrap_: Avoid `.unwrap()` in production; at least use `.expect("...")` with a                     message that locates the bug.
+- _borrow_: “cannot borrow as mutable because it is also borrowed as immutable” usually means you’re holding                     a `&` across a `&mut` call; split the scope.
+- _async_: An `async fn` does nothing until `.await`. Forgetting `.await` is                     silently a no-op (clippy warns).
+- _size_: Trait objects (`dyn Trait`) are unsized; store behind `Box`,                     `&`, `Arc`, or `Rc`.
+- _orphan_: You can implement a trait for a type only if you own one of them; known as the orphan rule.

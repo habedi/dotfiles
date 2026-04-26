@@ -1,8 +1,9 @@
-# Zig 0.16.0 Cheatsheet
+# Notes on Zig
 
-Quick reference for **Zig 0.16.0**: a small, explicit systems language. The 0.16 release introduces I/O as an Interface (`std.Io`) and rewires `main` to take a `std.process.Init`. No hidden control flow, no hidden allocations, no preprocessor; `comptime` replaces macros and generics; errors are values; allocators are explicit and passed in.
+Quick reference for Zig (0.16.0): a small, explicit system programming language.
+The 0.16.0 release added I/O as an Interface (`std.Io`) and rewires `main` to take a `std.process.Init`. No hidden control flow, no hidden allocations, no preprocessor; `comptime` replaces macros and generics; errors are values; allocators are explicit and passed in.
 
-Each section has a core idiom; expand the **More examples** blocks for extended snippets.
+Each section has a core idiom; expand the _More examples_ blocks for extended snippets.
 
 ## Hello World and Toolchain
 
@@ -13,7 +14,7 @@ const std = @import("std");
 
 pub fn main(init: std.process.Init) !void {
     try std.Io.File.stdout().writeStreamingAll(init.io, "Hello, world!\n");
-    std.debug.print("formatted: {d}\n", .{42}); // debug.print still works (stderr)
+    std.debug.print("formatted: {d}\n", .{42}); // Debug.print still works (stderr)
 }
 ```
 
@@ -46,25 +47,25 @@ pub fn main(init: std.process.Init) !void {
 `const` by default; `var` only when you need to mutate. Numeric literals are untyped until used.
 
 ```zig
-const pi: f64 = 3.14159;        // immutable, typed
-var count: u32 = 0;             // mutable
+const pi: f64 = 3.14159;        // Immutable and typed
+var count: u32 = 0;             // Mutable
 count += 1;
 
-const inferred = 42;            // comptime_int, coerces to any int
+const inferred = 42;            // Type comptime_int; coerces to any int
 const hex = 0xFF; const bin = 0b1010; const oct = 0o17;
-const million = 1_000_000;       // underscores allowed
+const million = 1_000_000;       // Underscores allowed
 ```
 
 ??? example "More examples"
 
     ```zig title="strings & chars"
-    const name: []const u8 = "Zig";     // string = []const u8 (slice of bytes)
+    const name: []const u8 = "Zig";     // String = []const u8 (slice of bytes)
     const raw  = \\multi-line
     \\raw string
     ;
     const nl: u8 = '\n';
     const emoji = "\u{1F600}";          // UTF-8 sequence
-    const joined = "hello " ++ "world";  // compile-time concat
+    const joined = "hello " ++ "world";  // Compile-time concat
     const repeated = "-" ** 10;          // "----------"
     ```
 
@@ -72,7 +73,7 @@ const million = 1_000_000;       // underscores allowed
     const result = blk: {
         var x: u32 = 0;
         for (0..10) |i| x += @as(u32, @intCast(i));
-        break :blk x;       // labeled break yields value
+        break :blk x;       // Labeled break yields value
     };
     ```
 
@@ -93,12 +94,12 @@ Arbitrary-width integers, explicit numeric conversions, and a few special types 
 
     ```zig title="explicit conversions"
     const a: i32 = 100;
-    const b: i64 = a;                       // widening: implicit
-    const c: i16 = @intCast(a);             // narrowing: explicit, panic on overflow
-    const d: u32 = @bitCast(@as(i32, -1));   // reinterpret bits
+    const b: i64 = a;                       // Widening: implicit
+    const c: i16 = @intCast(a);             // Narrowing: explicit, panic on overflow
+    const d: u32 = @bitCast(@as(i32, -1));   // Reinterpret bits
     const e: f32 = @floatFromInt(a);
-    const f: i32 = @intFromFloat(3.7);       // truncates toward zero
-    const g: u8  = @truncate(0x1FF);          // keeps low 8 bits
+    const f: i32 = @intFromFloat(3.7);       // Truncates toward zero
+    const g: u8  = @truncate(0x1FF);          // Keeps low 8 bits
     ```
 
     ```zig title="arbitrary-width ints & overflow"
@@ -168,8 +169,8 @@ maybe = 7;
 if (maybe) |val| print("got {}\n", .{val})
 else          print("none\n", .{});
 
-const x = maybe orelse 0;     // default
-const y = maybe.?;             // unwrap, panic on null
+const x = maybe orelse 0;     // Default
+const y = maybe.?;             // Unwrap, panic on null
 ```
 
 ??? example "More examples"
@@ -204,9 +205,9 @@ fn parse(s: []const u8) ParseError!u32 {
     return std.fmt.parseInt(u32, s, 10) catch return error.Invalid;
 }
 
-const n = try parse("42");          // propagate
-const m = parse("x") catch 0;       // default
-parse("x") catch |err| log(err);   // inspect
+const n = try parse("42");          // Propagate
+const m = parse("x") catch 0;       // Default
+parse("x") catch |err| log(err);   // Inspect
 ```
 
 ??? example "More examples"
@@ -227,7 +228,7 @@ parse("x") catch |err| log(err);   // inspect
 
     ```zig title="error trace (debug builds)"
     // `try` and `return error.X` automatically populate a stack trace
-    // the runtime prints on panic. No setup needed.
+    // The runtime prints on panic. No setup needed.
     ```
 
 ## Functions
@@ -270,12 +271,12 @@ Arrays have a known length in the type; slices are pointer + length; pointers co
                 flavors.
 
 ```zig
-const arr = [_]i32{ 1, 2, 3, 4 };       // type [4]i32
+const arr = [_]i32{ 1, 2, 3, 4 };       // Type [4]i32
 const slice: []const i32 = arr[1..3];   // {2, 3}
-const len   = slice.len;                // runtime length
+const len   = slice.len;                // Runtime length
 
 var x: i32 = 10;
-const p: *i32 = &x;                       // single-item pointer
+const p: *i32 = &x;                       // Single-item pointer
 p.* = 20;
 ```
 
@@ -291,7 +292,7 @@ p.* = 20;
     ```
 
     ```zig title="array tricks"
-    const zeros = [_]u8{0} ** 16;     // repeat literal: [16]u8 of zeros
+    const zeros = [_]u8{0} ** 16;     // Repeat literal: [16]u8 of zeros
     const table = [_]u32{ 1, 2, 4, 8, 16 };
     @compileLog(table.len);             // 5
 
@@ -326,23 +327,23 @@ const n = v.length();         // 5
 
     ```zig title="default fields, packed, extern"
     const Config = struct {
-        retries: u32 = 3,           // default
+        retries: u32 = 3,           // Default
         verbose: bool = false,
     };
 
-    // packed: bit-precise layout, useful for protocols
+    // Packed: bit-precise layout, useful for protocols
     const Header = packed struct {
         flag: u1,
         kind: u3,
         len:  u12,
     };
 
-    // extern: C ABI for interop with C structs
+    // Extern: C ABI for interop with C structs
     const CTimespec = extern struct { sec: i64, nsec: i64 };
     ```
 
     ```zig title="anonymous struct literals"
-    // type can be inferred from the destination
+    // Type can be inferred from the destination
     fn draw(p: struct { x: i32, y: i32 }) void { ... }
     draw(.{ .x = 1, .y = 2 });
     ```
@@ -388,7 +389,7 @@ switch (s) {
     const SysCall = enum(u32) {
         read = 0,
         write = 1,
-        _,                         // allows other values
+        _,                         // Allows other values
     };
     ```
 
@@ -406,7 +407,7 @@ pub fn main(init: std.process.Init) !void {
 
     // ...or build your own DebugAllocator (the GPA successor).
     var dbg = std.heap.DebugAllocator(.{}){};
-    defer _ = dbg.deinit();          // reports leaks
+    defer _ = dbg.deinit();          // Reports leaks
     _ = dbg.allocator();
 
     const buf = try alloc.alloc(u8, 1024);
@@ -432,11 +433,11 @@ pub fn main(init: std.process.Init) !void {
 
     ```zig title="arena pattern"
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    defer arena.deinit();           // frees everything
+    defer arena.deinit();           // Frees everything
     const a = arena.allocator();
 
     for (0..1000) |_| {
-        _ = try a.alloc(u8, 64);    // no individual frees needed
+        _ = try a.alloc(u8, 64);    // No individual frees needed
     }
     ```
 
@@ -501,13 +502,13 @@ Cleanup that runs on every exit (`defer`) or only on the error path (`errdefer`)
 ```zig
 fn work(alloc: std.mem.Allocator) ![]u8 {
     const buf = try alloc.alloc(u8, 64);
-    errdefer alloc.free(buf);   // only on error
+    errdefer alloc.free(buf);   // Only on error
 
-    try doSomething(buf);       // if this fails, buf is freed
-    return buf;                 // success: caller owns it
+    try doSomething(buf);       // If this fails, buf is freed
+    return buf;                 // Success: caller owns it
 }
 
-defer file.close();           // runs on scope exit, always
+defer file.close();           // Runs on scope exit, always
 ```
 
 ??? example "More examples"
@@ -516,7 +517,7 @@ defer file.close();           // runs on scope exit, always
     defer print("1\n", .{});
     defer print("2\n", .{});
     defer print("3\n", .{});
-    // prints: 3 2 1
+    // Prints: 3 2 1
     ```
 
     ```zig title="errdefer captures the error"
@@ -581,7 +582,7 @@ pub fn build(b: *std.Build) void {
 
     // Add a dependency declared in build.zig.zon
     const dep = b.dependency("zap", .{ .target = target, .optimize = optimize });
-    exe.root_module.addImport("zap", dep.module("zap"));  // root_module is now built via b.createModule
+    exe.root_module.addImport("zap", dep.module("zap"));  // The root_module is now built via b.createModule
     ```
 
     | Optimize mode | Behavior |
@@ -615,7 +616,7 @@ test "slice equal" {
     test "no leaks" {
         const alloc = testing.allocator;
         const buf = try alloc.alloc(u8, 8);
-        defer alloc.free(buf);                 // forget this and the test fails
+        defer alloc.free(buf);                 // Forget this and the test fails
         try testing.expect(buf.len == 8);
     }
     ```
@@ -745,9 +746,9 @@ The standard library is large but discoverable; here are the modules you’ll to
 
 ## Common Gotchas
 
-- **unused** Unused variables, imports, and parameters are _compile errors_. Discard with `_                     =`.
-- **slices** A slice borrows; storing one outliving its backing storage is undefined behavior.
-- **undefined** `= undefined` means uninitialized memory; reading before writing is UB in release                     builds.
-- **comptime** Functions that take `comptime T: type` must be called with a comptime-known type.                     Usually fine, but watch for hot loops.
-- **stdin** `std.io.getStdIn().reader().readUntilDelimiter…` requires a buffer you own; nothing is                     allocated implicitly.
-- **error** Don’t silently `catch unreachable` for errors that _can_ happen; use `catch                     |e|` with a real branch.
+- _unused_: Unused variables, imports, and parameters are _compile errors_. Discard with `_                     =`.
+- _slices_: A slice borrows; storing one outliving its backing storage is undefined behavior.
+- _undefined_: `= undefined` means uninitialized memory; reading before writing is UB in release                     builds.
+- _comptime_: Functions that take `comptime T: type` must be called with a comptime-known type.                     Usually fine, but watch for hot loops.
+- _stdin_: `std.io.getStdIn().reader().readUntilDelimiter…` requires a buffer you own; nothing is                     allocated implicitly.
+- _error_: Don’t silently `catch unreachable` for errors that _can_ happen; use `catch                     |e|` with a real branch.

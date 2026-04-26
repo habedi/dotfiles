@@ -4,14 +4,14 @@ This file provides guidance to coding agents collaborating on this repository.
 
 ## Mission
 
-This is a personal dotfiles repository: shell scripts, editor and Git configuration, single-page HTML cheatsheets, AI agent skills, etc.
+This is a personal dotfiles repository: shell scripts, editor and Git configuration, technical notes, AI agent skills, etc.
 There is no application to ship and no production runtime.
 Priorities, in order:
 
 1. Files that work as intended on a fresh Linux user account with bash.
 2. Small, self-contained, easy-to-read shell and Markdown.
 3. No surprise side effects: scripts must be safe to re-run.
-4. Cheatsheets and skills that stay accurate and copy-pasteable.
+4. Technical notes and skills that stay accurate and copy-pasteable.
 
 ## Core Rules
 
@@ -34,10 +34,10 @@ Priorities, in order:
 
 ## Repository Layout
 
-- `scripts/`: Bash scripts for system setup and maintenance (font and CLI tool installers, GPU fix, snap cleanup, file concatenation, and a
-  self-destruct helper).
+- `scripts/`: Bash scripts for system setup and maintenance (font and CLI tool installers, GPU fix, snap cleanup, file concatenation, decompression
+  helper, system updater, and a self-destruct helper).
 - `git/gitconfig`: Personal Git configuration meant to be referenced from `~/.gitconfig` or copied directly.
-- `docs/`: Markdown sources for the cheatsheets, built with MkDocs Material. Currently `docs/zig.md` and `docs/rust.md`, plus `docs/index.md` as the
+- `docs/`: Markdown sources for the technical notes, built with MkDocs Material. Currently `docs/zig.md` and `docs/rust.md`, plus `docs/index.md` as the
   landing page.
 - `mkdocs.yml`: MkDocs configuration. Theme, navigation, and Markdown extensions live here.
 - `skills/`: Markdown skill files for AI agents. Each skill lives in its own directory with a `SKILL.md` entry point.
@@ -46,9 +46,9 @@ Priorities, in order:
 - `pyproject.toml`: Python environment used to host the MkDocs toolchain (`mkdocs`, `mkdocs-material`) and developer tools like `pre-commit`. There is
   no Python application code.
 - `.github/workflows/docs.yml`: GitHub Pages deploy job. Runs `uv run mkdocs build --strict` and pushes the generated `site/` to the `gh-pages` branch
-  on push to `main` or any `v*` tag.
+  on push to `main` or `develop`, on any `v*` tag, or via manual workflow dispatch.
 - `.github/ISSUE_TEMPLATE/`: Issue templates for bug reports and feature requests.
-- `README.md`: Index of what the repository contains, with links to the deployed cheatsheets.
+- `README.md`: Index of what the repository contains, with links to the deployed technical notes.
 
 ## Conventions
 
@@ -63,9 +63,9 @@ Priorities, in order:
   the intent unambiguous.
 - Keep dependencies on non-default tools to a minimum, and document any in a comment near the top of the file.
 
-### Cheatsheets
+### Technical Notes
 
-- Cheatsheets are Markdown files in `docs/`, rendered by MkDocs Material.
+- Technical Notes are Markdown files in `docs/`, rendered by MkDocs Material.
 - Each section is an `## H2`. Keep titles in title case.
 - Open every section with a one-sentence lede paragraph.
 - Code samples go in fenced code blocks with a language tag (` ```zig title="hello.zig" `, ` ```rust title="src/main.rs" `, etc.). The `title` is optional.
@@ -100,6 +100,6 @@ There is no test suite. Before opening a pull request:
 Suggested PR checklist:
 
 - [ ] `shellcheck` clean for any modified or new shell scripts
-- [ ] Cheatsheet changes previewed in a browser (light and dark)
-- [ ] README updated if a new script, cheatsheet, or skill was added
+- [ ] Technical Note changes previewed in a browser (light and dark)
+- [ ] README updated if a new script, technical note, or skill was added
 - [ ] No machine-specific paths, secrets, or personal data introduced
