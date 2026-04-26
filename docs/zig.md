@@ -1,7 +1,8 @@
-# Notes on Zig
+# Notes on Zig ⚡
 
 Quick reference for Zig (0.16.0): a small, explicit system programming language.
-The 0.16.0 release added I/O as an Interface (`std.Io`) and rewires `main` to take a `std.process.Init`. No hidden control flow, no hidden allocations, no preprocessor; `comptime` replaces macros and generics; errors are values; allocators are explicit and passed in.
+The 0.16.0 release added I/O as an Interface (`std.Io`) and rewires `main` to take a `std.process.Init`. No hidden control flow, no hidden
+allocations, no preprocessor; `comptime` replaces macros and generics; errors are values; allocators are explicit and passed in.
 
 Each section has a core idiom; expand the _More examples_ blocks for extended snippets.
 
@@ -81,14 +82,14 @@ const million = 1_000_000;       // Underscores allowed
 
 Arbitrary-width integers, explicit numeric conversions, and a few special types you’ll meet early.
 
-| Family | Examples | Notes |
-| --- | --- | --- |
-| Signed int | `i8 i16 i32 i64 i128 isize` | Plus arbitrary `iN` up to `i65535`. |
-| Unsigned int | `u8 u16 u32 u64 u128 usize` | `usize` is pointer-sized. |
-| Float | `f16 f32 f64 f80 f128` | IEEE-754. |
-| Bool, Unit | `bool`, `void`, `noreturn` | `noreturn` for fns that never return. |
-| Meta | `type`, `anytype`, `anyopaque` | Used in generics and FFI. |
-| String | `[]const u8`, `[*:0]const u8` | Slices and null-terminated for C. |
+| Family       | Examples                       | Notes                                 |
+|--------------|--------------------------------|---------------------------------------|
+| Signed int   | `i8 i16 i32 i64 i128 isize`    | Plus arbitrary `iN` up to `i65535`.   |
+| Unsigned int | `u8 u16 u32 u64 u128 usize`    | `usize` is pointer-sized.             |
+| Float        | `f16 f32 f64 f80 f128`         | IEEE-754.                             |
+| Bool, Unit   | `bool`, `void`, `noreturn`     | `noreturn` for fns that never return. |
+| Meta         | `type`, `anytype`, `anyopaque` | Used in generics and FFI.             |
+| String       | `[]const u8`, `[*:0]const u8`  | Slices and null-terminated for C.     |
 
 ??? example "More examples"
 
@@ -121,9 +122,9 @@ while (i < 10) : (i += 1) print("{d}\n", .{i});
 for (items, 0..) |item, idx| print("{d}: {}\n", .{ idx, item });
 
 const label = switch (color) {
-    .red, .pink => "warm",
-    .blue, .cyan => "cool",
-    else => "other",
+.red, .pink => "warm",
+.blue, .cyan => "cool",
+else => "other",
 };
 ```
 
@@ -160,7 +161,7 @@ const label = switch (color) {
 ## Optionals
 
 No null pointers in Zig. `?T` is the only way to express “maybe absent”, and the compiler forces you to handle
-                it.
+it.
 
 ```zig
 var maybe: ?u32 = null;
@@ -195,7 +196,7 @@ const y = maybe.?;             // Unwrap, panic on null
 ## Errors
 
 Errors are values from an `error` set. `!` in a return type means “may also return one of these
-                errors”.
+errors”.
 
 ```zig
 const ParseError = error{ Empty, Invalid };
@@ -268,7 +269,7 @@ fn log(comptime fmt: []const u8, args: anytype) void {
 ## Arrays, Slices, and Pointers
 
 Arrays have a known length in the type; slices are pointer + length; pointers come in single-item, many-item, and slice
-                flavors.
+flavors.
 
 ```zig
 const arr = [_]i32{ 1, 2, 3, 4 };       // Type [4]i32
@@ -396,7 +397,7 @@ switch (s) {
 ## Allocators
 
 Memory is explicit: every allocation takes an `Allocator`. Pick the right one for the job and pair every `alloc`
-                with a `free` (or use an arena).
+with a `free` (or use an arena).
 
 ```zig
 const std = @import("std");
@@ -497,7 +498,7 @@ comptime {
 ## Defer and Errdefer
 
 Cleanup that runs on every exit (`defer`) or only on the error path (`errdefer`). Indispensable with
-                allocators and resources.
+allocators and resources.
 
 ```zig
 fn work(alloc: std.mem.Allocator) ![]u8 {
@@ -528,20 +529,20 @@ defer file.close();           // Runs on scope exit, always
 
 Built-in functions start with `@`. They cover reflection, casting, intrinsics, and module loading.
 
-| Group | Builtins |
-| --- | --- |
-| Modules | `@import`, `@cImport`, `@cInclude`, `@embedFile` |
-| Casts | `@as`, `@intCast`, `@floatCast`, `@ptrCast`, `@bitCast`, `@truncate` |
-| Conversions | `@intFromFloat`, `@floatFromInt`, `@intFromEnum`, `@enumFromInt`, `@intFromBool` |
-| Reflection | `@sizeOf`, `@alignOf`, `@typeInfo`, `@TypeOf`, `@typeName`, `@hasDecl`,                         `@hasField` |
-| Math and SIMD | `@min`, `@max`, `@abs`, `@sqrt`, `@mod`, `@rem`, `@splat`,                         `@reduce`, `@shuffle` |
-| Memory | `@memcpy`, `@memset`, `@addrOf` |
-| Diagnostics | `@panic`, `@compileError`, `@compileLog`, `@errorName` |
+| Group         | Builtins                                                                                                    |
+|---------------|-------------------------------------------------------------------------------------------------------------|
+| Modules       | `@import`, `@cImport`, `@cInclude`, `@embedFile`                                                            |
+| Casts         | `@as`, `@intCast`, `@floatCast`, `@ptrCast`, `@bitCast`, `@truncate`                                        |
+| Conversions   | `@intFromFloat`, `@floatFromInt`, `@intFromEnum`, `@enumFromInt`, `@intFromBool`                            |
+| Reflection    | `@sizeOf`, `@alignOf`, `@typeInfo`, `@TypeOf`, `@typeName`, `@hasDecl`,                         `@hasField` |
+| Math and SIMD | `@min`, `@max`, `@abs`, `@sqrt`, `@mod`, `@rem`, `@splat`,                         `@reduce`, `@shuffle`    |
+| Memory        | `@memcpy`, `@memset`, `@addrOf`                                                                             |
+| Diagnostics   | `@panic`, `@compileError`, `@compileLog`, `@errorName`                                                      |
 
 ## Build System (build.zig)
 
 A real Zig program defines its build graph in `build.zig`. Cross-compilation, optimization modes, and steps are
-                first-class.
+first-class.
 
 ```zig title="build.zig"
 const std = @import("std");
@@ -636,7 +637,7 @@ test "slice equal" {
 ## Threads and Atomics
 
 Async/await was removed in 0.11; the current concurrency story is OS threads, mutexes, channels (in user libs), and
-                atomics.
+atomics.
 
 ```zig
 const std = @import("std");
@@ -674,7 +675,7 @@ pub fn main() !void {
 ## C Interop
 
 First-class. Translate headers with `@cImport`, link C with `-lc`, declare `extern fn`
-                for plain symbols.
+for plain symbols.
 
 ```zig
 const c = @cImport({
@@ -706,22 +707,22 @@ pub fn main() void {
 
 The standard library is large but discoverable; here are the modules you’ll touch most.
 
-| Module | What it has |
-| --- | --- |
-| `std.fmt` | `format`, `parseInt`, `parseFloat`, `bufPrint`, `allocPrint`. |
-| `std.mem` | Slice ops: `eql`, `indexOf`, `split`, `tokenize`, `copy`,                         `swap`. |
-| `std.fs` | `cwd()`, `openFileAbsolute`, `Dir.iterate`, `File.reader/writer`. |
-| `std.io` | Generic readers and writers, buffered I/O, fixed-buffer streams. |
-| `std.ArrayList(T)` | Growable array, takes an allocator. |
-| `std.AutoHashMap(K,V)`, `StringHashMap` | Hash maps with sensible defaults. |
-| `std.json` | Parse + stringify, with reflection-driven (de)serialize. |
-| `std.http` | HTTP client and basic server. |
-| `std.crypto` | Hashes, MACs, ciphers, KDFs, X25519, Ed25519. |
-| `std.process` | Args, env, child processes, exit codes. |
-| `std.os` | POSIX and syscall layer (per-target). |
-| `std.time` | Monotonic and wall clocks, sleep, timers. |
-| `std.log` | Leveled logging configurable per scope. |
-| `std.testing` | Assertions and the leak-checking allocator. |
+| Module                                  | What it has                                                                               |
+|-----------------------------------------|-------------------------------------------------------------------------------------------|
+| `std.fmt`                               | `format`, `parseInt`, `parseFloat`, `bufPrint`, `allocPrint`.                             |
+| `std.mem`                               | Slice ops: `eql`, `indexOf`, `split`, `tokenize`, `copy`,                         `swap`. |
+| `std.fs`                                | `cwd()`, `openFileAbsolute`, `Dir.iterate`, `File.reader/writer`.                         |
+| `std.io`                                | Generic readers and writers, buffered I/O, fixed-buffer streams.                          |
+| `std.ArrayList(T)`                      | Growable array, takes an allocator.                                                       |
+| `std.AutoHashMap(K,V)`, `StringHashMap` | Hash maps with sensible defaults.                                                         |
+| `std.json`                              | Parse + stringify, with reflection-driven (de)serialize.                                  |
+| `std.http`                              | HTTP client and basic server.                                                             |
+| `std.crypto`                            | Hashes, MACs, ciphers, KDFs, X25519, Ed25519.                                             |
+| `std.process`                           | Args, env, child processes, exit codes.                                                   |
+| `std.os`                                | POSIX and syscall layer (per-target).                                                     |
+| `std.time`                              | Monotonic and wall clocks, sleep, timers.                                                 |
+| `std.log`                               | Leveled logging configurable per scope.                                                   |
+| `std.testing`                           | Assertions and the leak-checking allocator.                                               |
 
 ??? example "Idiomatic snippets"
 
@@ -748,7 +749,7 @@ The standard library is large but discoverable; here are the modules you’ll to
 
 - _unused_: Unused variables, imports, and parameters are _compile errors_. Discard with `_                     =`.
 - _slices_: A slice borrows; storing one outliving its backing storage is undefined behavior.
-- _undefined_: `= undefined` means uninitialized memory; reading before writing is UB in release                     builds.
-- _comptime_: Functions that take `comptime T: type` must be called with a comptime-known type.                     Usually fine, but watch for hot loops.
-- _stdin_: `std.io.getStdIn().reader().readUntilDelimiter…` requires a buffer you own; nothing is                     allocated implicitly.
+- _undefined_: `= undefined` means uninitialized memory; reading before writing is UB in release builds.
+- _comptime_: Functions that take `comptime T: type` must be called with a comptime-known type. Usually fine, but watch for hot loops.
+- _stdin_: `std.io.getStdIn().reader().readUntilDelimiter…` requires a buffer you own; nothing is allocated implicitly.
 - _error_: Don’t silently `catch unreachable` for errors that _can_ happen; use `catch                     |e|` with a real branch.

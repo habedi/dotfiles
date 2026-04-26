@@ -1,6 +1,7 @@
-# Notes on Rust
+# Notes on Rust 🦀
 
-Quick reference for Rust stable. Rust is a general-purpose programming language with memory and thread safety enforced at compile time via ownership and borrowing: no GC, no null, no data races. The standard toolchain is `rustup`, `cargo`, `rustc`, `rustfmt`, and `clippy`.
+Quick reference for Rust stable. Rust is a general-purpose programming language with memory and thread safety enforced at compile time via ownership
+and borrowing: no GC, no null, no data races. The standard toolchain is `rustup`, `cargo`, `rustc`, `rustfmt`, and `clippy`.
 
 Each section has a core idiom; expand the _More examples_ blocks for extended snippets.
 
@@ -65,16 +66,16 @@ let shadow: i32 = shadow.parse().unwrap();
 ## Primitive Types
 
 Strict, but small. The big distinction is owned vs borrowed (`String` vs `&str`, `Vec<T>`
-                vs `&[T]`).
+vs `&[T]`).
 
-| Family | Examples |
-| --- | --- |
-| Signed int | `i8 i16 i32 i64 i128 isize` |
-| Unsigned int | `u8 u16 u32 u64 u128 usize` |
-| Float | `f32 f64` |
-| Boolean, Char, Unit | `bool`, `char` (4 bytes), `()` |
-| String | `&str` borrowed UTF-8 slice, `String` owned and growable |
-| Sequence | `(T, U)` tuple, `[T; N]` array, `&[T]` slice, `Vec<T>` heap vec |
+| Family              | Examples                                                        |
+|---------------------|-----------------------------------------------------------------|
+| Signed int          | `i8 i16 i32 i64 i128 isize`                                     |
+| Unsigned int        | `u8 u16 u32 u64 u128 usize`                                     |
+| Float               | `f32 f64`                                                       |
+| Boolean, Char, Unit | `bool`, `char` (4 bytes), `()`                                  |
+| String              | `&str` borrowed UTF-8 slice, `String` owned and growable        |
+| Sequence            | `(T, U)` tuple, `[T; N]` array, `&[T]` slice, `Vec<T>` heap vec |
 
 ??? example "More examples"
 
@@ -171,7 +172,7 @@ while let Some(item) = it.next() { ... }
 ## Ownership and Borrowing
 
 Every value has exactly one owner. Borrows are checked at compile time. Either many `&T` readers or one
-                `&mut T` writer, never both.
+`&mut T` writer, never both.
 
 ```rust
 let s = String::from("hi");
@@ -381,7 +382,7 @@ fn make() -> impl Greet { En }
 ## Common Derives
 
 Auto-implement standard traits. Reach for these in this order: `Debug`, `Clone`,
-                `PartialEq`, `Eq`, `Hash`, `Default`.
+`PartialEq`, `Eq`, `Hash`, `Default`.
 
 ```rust
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -410,7 +411,7 @@ println!("{c:#?}");     // Pretty
 ## Collections
 
 Most code uses `Vec`, `HashMap`, and `HashSet`. `BTreeMap` for ordered keys,
-                `VecDeque` for queues.
+`VecDeque` for queues.
 
 ```rust
 use std::collections::{HashMap, HashSet, BTreeMap, VecDeque};
@@ -453,7 +454,7 @@ let s: HashSet<_> = [1, 2, 3].into_iter().collect();
 ## Iterators
 
 Lazy by design. Build a chain of adaptors, then call a consumer (`collect`, `sum`, `for`,
-                `find`, …) to drive it.
+`find`, …) to drive it.
 
 ```rust
 let nums = vec![1, 2, 3, 4, 5];
@@ -500,7 +501,7 @@ let all_pos   = nums.iter().all(|x| *x > 0);
 ## Error Handling
 
 Use `Result<T, E>`. For libraries: define your own error enum (often via `thiserror`). For
-                applications: `anyhow::Result` is fine.
+applications: `anyhow::Result` is fine.
 
 ```rust
 use std::io::{self, Read};
@@ -544,7 +545,7 @@ fn read_all(path: &str) -> io::Result<String> {
 ## Lifetimes
 
 Lifetimes describe how long borrows are valid. Most are elided; you only annotate when the compiler can’t relate input and
-                output references.
+output references.
 
 ```rust
 fn longest<'a>(a: &'a str, b: &'a str) -> &'a str {
@@ -578,14 +579,14 @@ impl<'a> View<'a> {
 
 Special types with owning semantics; pick by need: heap, shared, mutable-through-shared, thread-safe.
 
-| Pointer | Use when |
-| --- | --- |
-| `Box<T>` | One owner, value lives on the heap. Recursive types. |
-| `Rc<T>` | Shared ownership, single-threaded. |
-| `Arc<T>` | Shared ownership across threads (atomic refcount). |
-| `RefCell<T>`, `Cell<T>` | Interior mutability through `&`, single-threaded. |
-| `Mutex<T>`, `RwLock<T>` | Interior mutability across threads. |
-| `Cow<'a, T>` | Borrow until you actually need to mutate. |
+| Pointer                 | Use when                                             |
+|-------------------------|------------------------------------------------------|
+| `Box<T>`                | One owner, value lives on the heap. Recursive types. |
+| `Rc<T>`                 | Shared ownership, single-threaded.                   |
+| `Arc<T>`                | Shared ownership across threads (atomic refcount).   |
+| `RefCell<T>`, `Cell<T>` | Interior mutability through `&`, single-threaded.    |
+| `Mutex<T>`, `RwLock<T>` | Interior mutability across threads.                  |
+| `Cow<'a, T>`            | Borrow until you actually need to mutate.            |
 
 ??? example "More examples"
 
@@ -696,7 +697,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## Modules and Crates
 
 A _crate_ is a compilation unit. Inside it, `mod` creates a namespace tree. `pub` controls
-                visibility.
+visibility.
 
 ```rust
 // Src/lib.rs
@@ -744,7 +745,7 @@ use mycrate::{add, math::*};
 ## Testing
 
 Unit tests live next to the code; integration tests live in `tests/`; doctests run from `///`
-                examples.
+examples.
 
 ```rust
 #[cfg(test)]
@@ -791,18 +792,18 @@ mod tests {
 
 Macros end with `!`. They’re how Rust handles things that need variadics or syntax extensions.
 
-| Macro | Purpose |
-| --- | --- |
-| `println!`, `eprintln!`, and `print!` | Write to stdout or stderr. |
-| `format!`, `write!` | Build a `String`, or write to a `fmt::Write`. |
-| `vec![1, 2, 3]` | Construct a `Vec`. |
-| `matches!(x, P)` | Pattern test as a `bool`. |
-| `assert!`, `assert_eq!`, and `assert_ne!` | Test assertions. |
-| `debug_assert!` | Compiled out in release builds. |
-| `todo!()`, `unimplemented!()`, and `unreachable!()` | Placeholders that panic. |
-| `dbg!(x)` | Print and pass through, like `console.log(x)`. |
-| `include_str!`, `include_bytes!` | Embed file contents at compile time. |
-| `env!` | Read an env var at compile time. |
+| Macro                                               | Purpose                                        |
+|-----------------------------------------------------|------------------------------------------------|
+| `println!`, `eprintln!`, and `print!`               | Write to stdout or stderr.                     |
+| `format!`, `write!`                                 | Build a `String`, or write to a `fmt::Write`.  |
+| `vec![1, 2, 3]`                                     | Construct a `Vec`.                             |
+| `matches!(x, P)`                                    | Pattern test as a `bool`.                      |
+| `assert!`, `assert_eq!`, and `assert_ne!`           | Test assertions.                               |
+| `debug_assert!`                                     | Compiled out in release builds.                |
+| `todo!()`, `unimplemented!()`, and `unreachable!()` | Placeholders that panic.                       |
+| `dbg!(x)`                                           | Print and pass through, like `console.log(x)`. |
+| `include_str!`, `include_bytes!`                    | Embed file contents at compile time.           |
+| `env!`                                              | Read an env var at compile time.               |
 
 ??? example "More examples"
 
@@ -858,20 +859,20 @@ extern "C" {
 ## Std Library Tour
 
 A small map of where things live. The `prelude` brings `Option`, `Result`,
-                `String`, `Vec`, common traits etc. into scope automatically.
+`String`, `Vec`, common traits etc. into scope automatically.
 
-| Module | What it has |
-| --- | --- |
-| `std::fs` | Files, directories, metadata. |
-| `std::io` | `Read`, `Write`, `BufReader`, `BufWriter`, stdin, and stdout. |
-| `std::path` | `Path`, `PathBuf`; OS-agnostic path manipulation. |
-| `std::env` | Args, env vars, current dir. |
-| `std::process` | Spawn child processes, exit. |
-| `std::time` | `Duration`, `Instant`, `SystemTime`. |
-| `std::thread`, `std::sync` | Threads, channels, mutexes, atomics. |
-| `std::collections` | `HashMap`, `HashSet`, `BTreeMap`, `VecDeque`, `BinaryHeap`. |
-| `std::fmt` | `Display`, `Debug`, custom formatters. |
-| `std::num`, `std::str` | Parse errors, str ops. |
+| Module                     | What it has                                                   |
+|----------------------------|---------------------------------------------------------------|
+| `std::fs`                  | Files, directories, metadata.                                 |
+| `std::io`                  | `Read`, `Write`, `BufReader`, `BufWriter`, stdin, and stdout. |
+| `std::path`                | `Path`, `PathBuf`; OS-agnostic path manipulation.             |
+| `std::env`                 | Args, env vars, current dir.                                  |
+| `std::process`             | Spawn child processes, exit.                                  |
+| `std::time`                | `Duration`, `Instant`, `SystemTime`.                          |
+| `std::thread`, `std::sync` | Threads, channels, mutexes, atomics.                          |
+| `std::collections`         | `HashMap`, `HashSet`, `BTreeMap`, `VecDeque`, `BinaryHeap`.   |
+| `std::fmt`                 | `Display`, `Debug`, custom formatters.                        |
+| `std::num`, `std::str`     | Parse errors, str ops.                                        |
 
 ??? example "Crates worth knowing"
 
@@ -889,10 +890,11 @@ A small map of where things live. The `prelude` brings `Option`, `Result`,
 
 ## Common Gotchas
 
-- _strings_: `String` owns; `&str` borrows. Prefer `&str` in args,                     return `String` when you build new content.
-- _cloning_: `.clone()` is allowed but not free. If you’re cloning in a hot loop, reconsider                     lifetimes or `Cow`.
-- _unwrap_: Avoid `.unwrap()` in production; at least use `.expect("...")` with a                     message that locates the bug.
-- _borrow_: “cannot borrow as mutable because it is also borrowed as immutable” usually means you’re holding                     a `&` across a `&mut` call; split the scope.
-- _async_: An `async fn` does nothing until `.await`. Forgetting `.await` is                     silently a no-op (clippy warns).
+- _strings_: `String` owns; `&str` borrows. Prefer `&str` in args, return `String` when you build new content.
+- _cloning_: `.clone()` is allowed but not free. If you’re cloning in a hot loop, reconsider lifetimes or `Cow`.
+- _unwrap_: Avoid `.unwrap()` in production; at least use `.expect("...")` with a message that locates the bug.
+- _borrow_: “cannot borrow as mutable because it is also borrowed as immutable” usually means you’re holding a `&` across a `&mut` call; split the
+  scope.
+- _async_: An `async fn` does nothing until `.await`. Forgetting `.await` is silently a no-op (clippy warns).
 - _size_: Trait objects (`dyn Trait`) are unsized; store behind `Box`,                     `&`, `Arc`, or `Rc`.
 - _orphan_: You can implement a trait for a type only if you own one of them; known as the orphan rule.
