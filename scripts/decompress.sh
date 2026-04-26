@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Print header message
 echo -e "\e[36mDecompressing all .7z, .rar, and .zip files in the current directory...\e[0m"

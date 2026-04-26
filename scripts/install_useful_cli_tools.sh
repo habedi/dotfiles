@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # List of the packages to be installed and their descriptions
 packages=(

@@ -1,7 +1,8 @@
 # Notes on Rust 🦀
 
-Quick reference for Rust stable. Rust is a general-purpose programming language with memory and thread safety enforced at compile time via ownership
-and borrowing: no GC, no null, no data races. The standard toolchain is `rustup`, `cargo`, `rustc`, `rustfmt`, and `clippy`.
+Rust is a general-purpose programming language with memory and thread safety enforced at compile time via ownership and borrowing.
+Rust has no garbage collection, no null, and no data races that can lead to hard-to-debug bugs.
+The standard toolchain is `rustup`, `cargo`, `rustc`, `rustfmt`, and `clippy`.
 
 Each section has a core idiom; expand the _More examples_ blocks for extended snippets.
 
@@ -896,5 +897,5 @@ A small map of where things live. The `prelude` brings `Option`, `Result`,
 - _borrow_: “cannot borrow as mutable because it is also borrowed as immutable” usually means you’re holding a `&` across a `&mut` call; split the
   scope.
 - _async_: An `async fn` does nothing until `.await`. Forgetting `.await` is silently a no-op (clippy warns).
-- _size_: Trait objects (`dyn Trait`) are unsized; store behind `Box`,                     `&`, `Arc`, or `Rc`.
+- _size_: Trait objects (`dyn Trait`) are unsized; store behind `Box`, `&`, `Arc`, or `Rc`.
 - _orphan_: You can implement a trait for a type only if you own one of them; known as the orphan rule.

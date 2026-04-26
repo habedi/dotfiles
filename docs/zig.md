@@ -1,8 +1,9 @@
 # Notes on Zig ⚡
 
-Quick reference for Zig (0.16.0): a small, explicit system programming language.
-The 0.16.0 release added I/O as an Interface (`std.Io`) and rewires `main` to take a `std.process.Init`. No hidden control flow, no hidden
-allocations, no preprocessor; `comptime` replaces macros and generics; errors are values; allocators are explicit and passed in.
+Quick reference for Zig, which is a small, explicit system programming language.
+The 0.16.0 release added I/O as an Interface (`std.Io`) and rewires `main` to take a `std.process.Init`.
+No hidden control flow, no hidden allocations, no preprocessor; `comptime` replaces macros and generics; errors are values; allocators
+are explicit and passed in.
 
 Each section has a core idiom; expand the _More examples_ blocks for extended snippets.
 
@@ -33,7 +34,7 @@ pub fn main(init: std.process.Init) !void {
     | `zig env` | Show toolchain paths and target info. |
 
     ```zig title="formatted output"
-    // 0.16: I/O is an interface; pass an Io and a buffer to get a Writer.
+    // In 0.16.0, I/O is an interface; pass an Io and a buffer to get a Writer.
     var buf: [256]u8 = undefined;
     var w = std.Io.File.stdout().writer(init.io, &buf);
     try w.interface.print("value={d}\n", .{42});
@@ -747,9 +748,9 @@ The standard library is large but discoverable; here are the modules you’ll to
 
 ## Common Gotchas
 
-- _unused_: Unused variables, imports, and parameters are _compile errors_. Discard with `_                     =`.
+- _unused_: Unused variables, imports, and parameters are _compile errors_. Discard with `_ =`.
 - _slices_: A slice borrows; storing one outliving its backing storage is undefined behavior.
 - _undefined_: `= undefined` means uninitialized memory; reading before writing is UB in release builds.
 - _comptime_: Functions that take `comptime T: type` must be called with a comptime-known type. Usually fine, but watch for hot loops.
 - _stdin_: `std.io.getStdIn().reader().readUntilDelimiter…` requires a buffer you own; nothing is allocated implicitly.
-- _error_: Don’t silently `catch unreachable` for errors that _can_ happen; use `catch                     |e|` with a real branch.
+- _error_: Don’t silently `catch unreachable` for errors that _can_ happen; use `catch |e|` with a real branch.

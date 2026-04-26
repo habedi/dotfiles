@@ -11,7 +11,7 @@ This repository contains things like configuration files, scripts, technical not
 - **AI agent skills**
     - [slopify](skills/slopify/SKILL.md)
 - **Technical Notes**
-    - [Zig 0.16.0](https://habedi.github.io/dotfiles/zig/)
+    - [Zig (0.16.0)](https://habedi.github.io/dotfiles/zig/)
     - [Rust (stable)](https://habedi.github.io/dotfiles/rust/)
 
 ### License

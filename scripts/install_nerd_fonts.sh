@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Copied from: https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0?permalink_comment_id=4005789#gistcomment-4005789
 

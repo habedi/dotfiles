@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 echo "🚨 SYSTEM SELF-DESTRUCT SEQUENCE INITIATED 🚨"
 

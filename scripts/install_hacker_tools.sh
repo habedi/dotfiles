@@ -2,7 +2,7 @@
 
 # A script to install a few cool command-line tools on your Linux machine; great to show off your hacker skills
 
-set -e
+set -euo pipefail
 
 # Function to check if a command exists
 command_exists() {

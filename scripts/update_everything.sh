@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Make sure these packages are already installed
 # apt install sudo flatpak snapd zsh git curl wget unzip -y
