@@ -37,14 +37,16 @@ Priorities, in order:
 - `scripts/`: Bash scripts for system setup and maintenance (font and CLI tool installers, GPU fix, snap cleanup, file concatenation, and a
   self-destruct helper).
 - `git/gitconfig`: Personal Git configuration meant to be referenced from `~/.gitconfig` or copied directly.
-- `cheatsheets/`: Single-page HTML cheatsheets (currently Zig and Rust). Each cheatsheet is one self-contained `index.html` with embedded CSS and JS,
-  no external assets or build step.
+- `docs/`: Markdown sources for the cheatsheets, built with MkDocs Material. Currently `docs/zig.md` and `docs/rust.md`, plus `docs/index.md` as the
+  landing page.
+- `mkdocs.yml`: MkDocs configuration. Theme, navigation, and Markdown extensions live here.
 - `skills/`: Markdown skill files for AI agents. Each skill lives in its own directory with a `SKILL.md` entry point.
 - `.editorconfig`: Editor defaults (UTF-8, LF, four-space indent, final newline, trimmed trailing whitespace; Markdown, HTML, and CSS keep trailing
   whitespace and allow longer lines).
-- `pyproject.toml`: Lightweight Python environment used only to host developer tools like `pre-commit`. There is no Python application code.
-- `.github/workflows/docs.yml`: GitHub Pages deploy job. Stages `cheatsheets/` into a `site/` directory and pushes it to the `gh-pages` branch on push
-  to `main` or any `v*` tag.
+- `pyproject.toml`: Python environment used to host the MkDocs toolchain (`mkdocs`, `mkdocs-material`) and developer tools like `pre-commit`. There is
+  no Python application code.
+- `.github/workflows/docs.yml`: GitHub Pages deploy job. Runs `uv run mkdocs build --strict` and pushes the generated `site/` to the `gh-pages` branch
+  on push to `main` or any `v*` tag.
 - `.github/ISSUE_TEMPLATE/`: Issue templates for bug reports and feature requests.
 - `README.md`: Index of what the repository contains, with links to the deployed cheatsheets.
 
@@ -61,13 +63,16 @@ Priorities, in order:
   the intent unambiguous.
 - Keep dependencies on non-default tools to a minimum, and document any in a comment near the top of the file.
 
-### HTML Cheatsheets
+### Cheatsheets
 
-- Each cheatsheet is a single `index.html` that opens correctly when loaded from the local filesystem and when served from GitHub Pages.
-- No external scripts, no CDN fonts, and no network calls. CSS and JS are inlined.
-- Support both light and dark themes via `prefers-color-scheme`.
-- Sections have stable `id` attributes and are picked up by the table of contents script automatically.
-- Code samples go in `<pre>` blocks. Use the existing inline syntax classes (`k`, `s`, `n`, `c`, `t`, ...) rather than a syntax-highlighting library.
+- Cheatsheets are Markdown files in `docs/`, rendered by MkDocs Material.
+- Each section is an `## H2`. Keep titles in title case.
+- Open every section with a one-sentence lede paragraph.
+- Code samples go in fenced code blocks with a language tag (` ```zig title="hello.zig" `, ` ```rust title="src/main.rs" `, etc.). The `title` is optional.
+- Extended snippets and tables for a section live inside a collapsible block: `??? example "More examples"`, body indented by four spaces. Fenced code
+  inside the body must also be indented by four spaces (works with `pymdownx.superfences`).
+- Tables use plain Markdown table syntax, not HTML.
+- Build locally with `uv run mkdocs serve`; build for deploy with `uv run mkdocs build --strict`.
 
 ### Markdown and Skills
 
@@ -80,8 +85,8 @@ Priorities, in order:
 There is no test suite. Before opening a pull request:
 
 - Run `shellcheck` against any shell script you touched (or added).
-- Open changed cheatsheets in a browser; verify the table of contents builds,
-  the search filter works, and dark and light themes both render.
+- For docs changes, run `uv run mkdocs build --strict` locally; the build must succeed.
+- For visual changes, run `uv run mkdocs serve` and check both light and dark themes plus the search.
 - Confirm the `docs.yml` workflow is unchanged unless your change is a deployment fix; if it is, document the reason in the PR.
 
 ## Commit and PR Hygiene

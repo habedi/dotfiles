@@ -23,11 +23,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Stage site
-        run: |
-          mkdir -p site/cheatsheets
-          cp -r cheatsheets/. site/cheatsheets/
-          cp cheatsheets/index.html site/index.html
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Build documentation
+        run: uv run mkdocs build --strict
 
       - name: Deploy to GitHub pages
         uses: peaceiris/actions-gh-pages@v4
