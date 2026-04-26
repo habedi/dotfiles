@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # This script is used to manage Snap package revisions on a system.
 # It sets the Snap revision retain limit to 2 and cleans up old revisions of snaps.
