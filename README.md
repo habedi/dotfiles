@@ -1,5 +1,10 @@
 ## Dotfiles
 
+[![CI](https://github.com/habedi/dotfiles/actions/workflows/docs.yml/badge.svg)](https://github.com/habedi/dotfiles/actions/workflows/docs.yml)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](https://github.com/habedi/dotfiles/blob/main/LICENSE)
+
+---
+
 This repository contains things like configuration files, scripts, technical notes, etc. that I use for different projects.
 
 - **Python-related files**
@@ -13,6 +18,8 @@ This repository contains things like configuration files, scripts, technical not
 - **Technical Notes**
     - [Zig (0.16.0)](https://habedi.github.io/dotfiles/zig/)
     - [Rust (stable)](https://habedi.github.io/dotfiles/rust/)
+
+---
 
 ### License
 
