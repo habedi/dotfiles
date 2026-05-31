@@ -1,11 +1,12 @@
 # Notes on Zig ⚡
 
-Quick reference for Zig, which is a small, explicit system programming language.
-The 0.16.0 release added I/O as an Interface (`std.Io`) and rewires `main` to take a `std.process.Init`.
+This is a quick reference for [Zig programming language](https://ziglang.org/).
+The [0.16.0](https://ziglang.org/download/0.16.0/release-notes.html) release added I/O as an Interface (`std.Io`) and rewires `main` to take a
+`std.process.Init`.
 No hidden control flow, no hidden allocations, no preprocessor; `comptime` replaces macros and generics; errors are values; allocators
 are explicit and passed in.
 
-Each section has a core idiom; expand the _More examples_ blocks for extended snippets.
+Each section has a core idiom; expand the More examples blocks for extended snippets.
 
 ## Hello World and Toolchain
 
@@ -46,7 +47,8 @@ pub fn main(init: std.process.Init) !void {
 
 ## Variables, Constants, and Literals
 
-`const` by default; `var` only when you need to mutate. Numeric literals are untyped until used.
+Variables are `const` by default; use `var` only when you need to mutate values.
+Numeric literals are untyped until used.
 
 ```zig
 const pi: f64 = 3.14159;        // Immutable and typed
@@ -161,8 +163,8 @@ else => "other",
 
 ## Optionals
 
-No null pointers in Zig. `?T` is the only way to express “maybe absent”, and the compiler forces you to handle
-it.
+No null pointers in Zig.
+`?T` is the only way to express “maybe absent”, and the compiler forces you to handle it.
 
 ```zig
 var maybe: ?u32 = null;
@@ -196,8 +198,7 @@ const y = maybe.?;             // Unwrap, panic on null
 
 ## Errors
 
-Errors are values from an `error` set. `!` in a return type means “may also return one of these
-errors”.
+Errors are values from an `error` set. `!` in a return type means "may also return one of these errors".
 
 ```zig
 const ParseError = error{ Empty, Invalid };
@@ -235,7 +236,8 @@ parse("x") catch |err| log(err);   // Inspect
 
 ## Functions
 
-Plain, generic, or duck-typed via `anytype`. The first parameter convention for methods is `self`.
+Plain, generic, or duck-typed via `anytype`.
+The first parameter convention for methods is `self`.
 
 ```zig
 fn add(a: i32, b: i32) i32 { return a + b; }
@@ -269,8 +271,7 @@ fn log(comptime fmt: []const u8, args: anytype) void {
 
 ## Arrays, Slices, and Pointers
 
-Arrays have a known length in the type; slices are pointer + length; pointers come in single-item, many-item, and slice
-flavors.
+Arrays have a known length in the type; slices are pointer plus length; pointers come in single-item, many-item, and slice flavors.
 
 ```zig
 const arr = [_]i32{ 1, 2, 3, 4 };       // Type [4]i32
@@ -305,7 +306,8 @@ p.* = 20;
 
 ## Structs and Methods
 
-Structs are types. Methods are just functions with a `self` parameter declared inside the struct.
+Structs are types in Zig.
+Methods are just functions with a `self` parameter declared inside the struct.
 
 ```zig
 const Vec2 = struct {
@@ -340,7 +342,7 @@ const n = v.length();         // 5
         len:  u12,
     };
 
-    // Extern: C ABI for interop with C structs
+    // Extern: C ABI for interoperability with C structs
     const CTimespec = extern struct { sec: i64, nsec: i64 };
     ```
 
@@ -352,7 +354,8 @@ const n = v.length();         // 5
 
 ## Enums and Tagged Unions
 
-Enums are integers with names. `union(enum)` is a discriminated union: the foundation for sum types and ASTs.
+Enums are integers with names.
+`union(enum)` is a discriminated union: the foundation for sum types and ASTs.
 
 ```zig
 const Color = enum { red, green, blue };
@@ -397,8 +400,8 @@ switch (s) {
 
 ## Allocators
 
-Memory is explicit: every allocation takes an `Allocator`. Pick the right one for the job and pair every `alloc`
-with a `free` (or use an arena).
+Memory is explicit: every allocation takes an `Allocator`.
+Pick the right one for the job and pair every `alloc` with a `free` (or use an arena).
 
 ```zig
 const std = @import("std");
@@ -453,7 +456,8 @@ pub fn main(init: std.process.Init) !void {
 
 ## Comptime and Generics
 
-Run regular Zig at compile time. Types are values, so generics are just functions returning types.
+Run regular Zig at compile time.
+Types are values, so generics are just functions returning types.
 
 ```zig
 fn List(comptime T: type) type {
@@ -498,8 +502,7 @@ comptime {
 
 ## Defer and Errdefer
 
-Cleanup that runs on every exit (`defer`) or only on the error path (`errdefer`). Indispensable with
-allocators and resources.
+Cleanup that runs on every exit (`defer`) or only on the error path (`errdefer`). Indispensable with allocators and resources.
 
 ```zig
 fn work(alloc: std.mem.Allocator) ![]u8 {
@@ -528,7 +531,8 @@ defer file.close();           // Runs on scope exit, always
 
 ## Builtins and Casts
 
-Built-in functions start with `@`. They cover reflection, casting, intrinsics, and module loading.
+Built-in functions start with `@`.
+They cover reflection, casting, intrinsics, and module loading.
 
 | Group         | Builtins                                                                                                    |
 |---------------|-------------------------------------------------------------------------------------------------------------|
@@ -540,10 +544,11 @@ Built-in functions start with `@`. They cover reflection, casting, intrinsics, a
 | Memory        | `@memcpy`, `@memset`, `@addrOf`                                                                             |
 | Diagnostics   | `@panic`, `@compileError`, `@compileLog`, `@errorName`                                                      |
 
-## Build System (build.zig)
+## Build System
 
-A real Zig program defines its build graph in `build.zig`. Cross-compilation, optimization modes, and steps are
-first-class.
+A real Zig program defines its build graph in `build.zig`.
+Cross-compilation, optimization modes, and steps are first-class citizens in
+the [Zig build system](https://ziglang.org/documentation/master/#Zig-Build-System).
 
 ```zig title="build.zig"
 const std = @import("std");
@@ -596,8 +601,7 @@ pub fn build(b: *std.Build) void {
 
 ## Testing
 
-Tests are first-class: write `test "name" { ... }` next to the code, run with `zig test` or `zig
-                build test`.
+Tests are first-class: write `test "name" { ... }` next to the code, run with `zig test` or `zig build test`.
 
 ```zig
 const std = @import("std");
@@ -637,8 +641,7 @@ test "slice equal" {
 
 ## Threads and Atomics
 
-Async/await was removed in 0.11; the current concurrency story is OS threads, mutexes, channels (in user libs), and
-atomics.
+Async/await was removed in Zig 0.11; the current concurrency approach is using OS threads, mutexes, channels (in user libs), and atomics.
 
 ```zig
 const std = @import("std");
@@ -673,10 +676,10 @@ pub fn main() !void {
     fn isRunning() bool { return running.load(.acquire); }
     ```
 
-## C Interop
+## C Interoperability
 
-First-class. Translate headers with `@cImport`, link C with `-lc`, declare `extern fn`
-for plain symbols.
+Interoperability with C code is first-class in Zig.
+You can translate C headers with `@cImport`, link C with `-lc`, and declare `extern fn`for plain symbols.
 
 ```zig
 const c = @cImport({
@@ -748,9 +751,9 @@ The standard library is large but discoverable; here are the modules you’ll to
 
 ## Common Gotchas
 
-- _unused_: Unused variables, imports, and parameters are _compile errors_. Discard with `_ =`.
-- _slices_: A slice borrows; storing one outliving its backing storage is undefined behavior.
-- _undefined_: `= undefined` means uninitialized memory; reading before writing is UB in release builds.
-- _comptime_: Functions that take `comptime T: type` must be called with a comptime-known type. Usually fine, but watch for hot loops.
-- _stdin_: `std.io.getStdIn().reader().readUntilDelimiter…` requires a buffer you own; nothing is allocated implicitly.
-- _error_: Don’t silently `catch unreachable` for errors that _can_ happen; use `catch |e|` with a real branch.
+- `unused`: unused variables, imports, and parameters are compile errors. Discard with `_ =`.
+- `slices`: a slice uses borrowed memory; storing one outliving its backing storage is undefined behavior.
+- `undefined`: `= undefined` means uninitialized memory; reading before writing is UB in release builds.
+- `comptime`: functions that take `comptime T: type` must be called with a comptime-known type. Usually fine, but watch for hot loops.
+- `stdin`: `std.io.getStdIn().reader().readUntilDelimiter…` requires a buffer you own; nothing is allocated implicitly.
+- `error`: don’t silently `catch unreachable` for errors that can happen; use `catch |e|` with a real branch.

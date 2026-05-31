@@ -4,7 +4,7 @@ Rust is a general-purpose programming language with memory and thread safety enf
 Rust has no garbage collection, no null, and no data races that can lead to hard-to-debug bugs.
 The standard toolchain is `rustup`, `cargo`, `rustc`, `rustfmt`, and `clippy`.
 
-Each section has a core idiom; expand the _More examples_ blocks for extended snippets.
+Each section has a core idiom; expand the More examples blocks for extended snippets.
 
 ## Hello World and Toolchain
 
@@ -697,7 +697,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Modules and Crates
 
-A _crate_ is a compilation unit. Inside it, `mod` creates a namespace tree. `pub` controls
+A crate is a compilation unit. Inside it, `mod` creates a namespace tree. `pub` controls
 visibility.
 
 ```rust
@@ -891,11 +891,11 @@ A small map of where things live. The `prelude` brings `Option`, `Result`,
 
 ## Common Gotchas
 
-- _strings_: `String` owns; `&str` borrows. Prefer `&str` in args, return `String` when you build new content.
-- _cloning_: `.clone()` is allowed but not free. If you’re cloning in a hot loop, reconsider lifetimes or `Cow`.
-- _unwrap_: Avoid `.unwrap()` in production; at least use `.expect("...")` with a message that locates the bug.
-- _borrow_: “cannot borrow as mutable because it is also borrowed as immutable” usually means you’re holding a `&` across a `&mut` call; split the
+- strings: `String` owns; `&str` borrows. Prefer `&str` in args, return `String` when you build new content.
+- cloning: `.clone()` is allowed but not free. If you’re cloning in a hot loop, reconsider lifetimes or `Cow`.
+- unwrap: Avoid `.unwrap()` in production; at least use `.expect("...")` with a message that locates the bug.
+- borrow: “cannot borrow as mutable because it is also borrowed as immutable” usually means you’re holding a `&` across a `&mut` call; split the
   scope.
-- _async_: An `async fn` does nothing until `.await`. Forgetting `.await` is silently a no-op (clippy warns).
-- _size_: Trait objects (`dyn Trait`) are unsized; store behind `Box`, `&`, `Arc`, or `Rc`.
-- _orphan_: You can implement a trait for a type only if you own one of them; known as the orphan rule.
+- async: An `async fn` does nothing until `.await`. Forgetting `.await` is silently a no-op (clippy warns).
+- size: Trait objects (`dyn Trait`) are unsized; store behind `Box`, `&`, `Arc`, or `Rc`.
+- orphan: You can implement a trait for a type only if you own one of them; known as the orphan rule.
